@@ -103,7 +103,7 @@
                                         <field name="value_text_box"/>
                                         <field name="value_richtext_box"/>
                                         <templates>
-                                            <t t-name="kanban-box">
+                                            <t t-name="card">
                                                 <div class="oe_module_vignette" style="width: 900px;">
                                                     <div class="oe_module_desc">
                                                         <div class="float-right"><field name="create_date"/></div>
