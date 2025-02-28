@@ -30,7 +30,7 @@
         init: function (parent, slides, defaultSlideId, channelData) {
             var result = this._super.apply(this,arguments);
             this.initialSlideID = defaultSlideId;
-            this.slides = this._preprocessSlideData(slides);
+            // this.slides = this._preprocessSlideData(slides);
             this.channel = channelData;
             var slide;
             const urlParams = new URL(window.location).searchParams;
@@ -178,6 +178,13 @@
                             }
                         }
                     }
+                    if (data.peer_responses) {
+                        for (let i = 0; i < data.peer_responses.length; i++) {
+                            for (let j = 0; j < (data.peer_responses[i].user_response_line).length; j++) {
+                                data.peer_responses[i].user_response_line[j].value_richtext_box = markup(data.peer_responses[i].user_response_line[j].value_richtext_box)
+                            }
+                        }
+                    }
                     $content.empty().append(renderToFragment('slide.ora.assessment', {widget: data}));
                     $('textarea.o_wysiwyg_loader').toArray().forEach((textarea) => {
                         var $textarea = $(textarea);
@@ -219,7 +226,27 @@
         },
 
         _submitOra: function (ev) {
+            var responseData = []
+            $('.o_wslides_ora_answer_info').each(function () {
+                var response_div_id = `response_div_${this.id}`;
+                var $response_div = $(`.${response_div_id}`);
+                if ($response_div.length && !$response_div.val()) {
+                    var richTextValue = $response_div.find('.note-editable').html();
+                    responseData.push({ name: this.id, value: richTextValue });
+                }
+            });            
+            responseData;
             var data = $('#ora_form').serializeArray();
+            responseData.forEach(function (item) {
+                var existingField = data.find(function (field) {
+                    return field.name === item.name;
+                });
+                if (existingField) {
+                    existingField.value = item.value;
+                } else {
+                    data.push({ name: item.name, value: item.value });
+                }
+            });        
             data.push({ name: ev.currentTarget.name, value: ev.currentTarget.value });
             ev.preventDefault();
             var self = this;

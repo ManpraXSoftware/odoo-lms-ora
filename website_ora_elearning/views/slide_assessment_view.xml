@@ -103,7 +103,7 @@
                                         <field name="value_text_box"/>
                                         <field name="value_richtext_box"/>
                                         <templates>
-                                            <t t-name="kanban-box">
+                                            <t t-name="card">
                                                 <div class="oe_module_vignette" style="width: 900px;">
                                                     <div class="oe_module_desc">
                                                         <div class="float-right"><field name="create_date"/></div>
@@ -114,7 +114,7 @@
                                                             <div><p><strong>Response</strong></p></div>
                                                             <t t-if="record.response_type.raw_value == 'text'">
                                                                 <p style="overflow-wrap: break-word;">
-                                                                    <field name="value_text_box"/>
+                                                                    <field name="value_text_box" style="white-space:break-spaces;" />
                                                                 </p>
                                                             </t>
                                                             <t t-if="record.response_type.raw_value == 'rich_text'">

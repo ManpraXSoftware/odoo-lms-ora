@@ -23,6 +23,8 @@ class WebsiteSlidesORA(WebsiteSlides):
             self.add_answers(kwargs, resubmit_copy_response)
             user_response.state = 'inactive'
         if kwargs.get('submit') == 'submit':
+            if len(user_response) > 1:
+                user_response = user_response[-1]    
             user_response.state = 'submitted'
             user_response.submitted_date = datetime.now()
             self.add_answers(kwargs, user_response)
