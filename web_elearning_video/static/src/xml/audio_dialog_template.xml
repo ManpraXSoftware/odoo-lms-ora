@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="wysiwyg.widgets.audio">
+    
+        <div class="o_wysiwyg_audio_dialog">
+            <div class="o_audio_dialog">
+                <div class="form-group">
+                    <div>
+                        <audio class="recorded" autoplay="autoplay" playsinline="playsinline" controls="controls"></audio>
+                    </div>
+                    <div style="margin-top: 20px;margin-left: 10px;">
+                        <button class="note-record-audio-btn btn btn-primary">Start</button>
+                        <button class="note-record-stop-btn btn btn-primary" disabled="disabled">Stop</button>
+                        <button class="note-audio-play btn btn-primary" disabled="disabled">Play</button>
+                        <button class="note-audio-download btn btn-primary" disabled="disabled">Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>
