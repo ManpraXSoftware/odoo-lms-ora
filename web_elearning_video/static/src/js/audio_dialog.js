@@ -18,7 +18,7 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
         init: function (parent, media, editable) {
             this._super(parent, _.extend({}, {
                 title: _t("Add Audio"),
-                save_text: _t("Add"),
+                buttons: [{ text: _t("Add"), classes: 'btn-primary', click: this.save },{ text: _t("Discard"), classes: 'btn-secondary', close: true }],
             }, {}));
             this.constraints = { audio: true, video: false };
             this.mediaRecorder;
@@ -26,7 +26,9 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
             this.editable = editable;
         },
         start: function () {
-            recordedBlobs = []
+            recordedBlobs = [];
+            this.timerDisplay = this.$('.record-timer');
+            this.recordDot = this.$('.record-dot');
             this.startButton = this.$('button.note-record-audio-btn');
             this.stopButton = this.$('button.note-record-stop-btn');
             this.playButton = this.$('button.note-audio-play');
@@ -42,7 +44,9 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
         },
 
         _onClickStart: function (ev) {
-            recordedBlobs = []
+            recordedBlobs = [];
+            this._startTimer();
+            this._showRecordDot();
             try {
                 this.mediaRecorder = new MediaRecorder(window.stream);
             } catch (e0) {
@@ -59,6 +63,8 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
         },
 
         _onClickStop: function (ev) {
+            this._stopTimer();
+            this._hideRecordDot();
             this.mediaRecorder.stop();
             ev.currentTarget.disabled = true;
             this.playButton.get(0).disabled = false;
@@ -66,6 +72,37 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
             this.downloadButton.get(0).disabled = false
         },
 
+        _startTimer: function () {
+            let seconds = 0;
+            let minutes = 0;
+            let self = this;
+            this.timerDisplay.show();
+            this.timerDisplay.text('00:00');
+    
+            this.timerInterval = setInterval(() => {
+                seconds++;
+                if (seconds === 60) {
+                    minutes++;
+                    seconds = 0;
+                }
+                let formattedTime = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                self.timerDisplay.text(formattedTime);
+            }, 1000);
+        },
+    
+        _stopTimer: function () {
+            clearInterval(this.timerInterval);
+            this.recordedTime = this.timerDisplay.text();
+        },
+        
+        _showRecordDot: function () {
+            this.recordDot.show();
+        },
+
+        _hideRecordDot: function () {
+            this.recordDot.hide();
+        },
+        
         handleDataAvailable: function (event) {
             if (event.data && event.data.size > 0) {
                 recordedBlobs.push(event.data);
@@ -103,22 +140,18 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
                     });
                 }
                 this.final_data = attachmentObj;
-                let url = window.location.origin + '/web/content/' + attachmentObj.id + '?autoplay=0&controls=1';
-                let audioUrl = `
-                    <div class="media_iframe_video iframe_custom o_we_selected_image">
-                        <div class="" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
-                        <audio controls='controls'>
-                            <source src="${url}" type="audio/webm" />
-                        </audio>
-                    </div><br/>`;
-                var pTag = this.editable.find('p');
-                if (pTag.length > 1) {
-                    pTag.last().append(audioUrl);
-                } else {
-                    pTag.append(audioUrl);
-                }
+                let src = window.location.origin + '/web/content/' + attachmentObj.id + '?autoplay=0&controls=1';
+                const audioUrl = $(
+                    '<div class="media_iframe_audio" data-oe-expression="' + src + '">' +
+                        '<div class="css_editable_mode_display">&nbsp;</div>' +
+                        '<audio src="' + src + '" controls="controls" frameborder="0" contenteditable="false""></audio>' +
+                    '</div>'
+                );
+                this.$media = audioUrl;
+                this.media = this.$media[0];
+                    
             }
-            this.close();
+            return Promise.resolve(this.media);
         },
 
         destroy: function () {
@@ -149,8 +182,7 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
                     params: {
                         'name': 'recording.webm',
                         'data': bs64Audio.split(',')[1],
-                        'res_id': $.summernote.options.res_id,
-                        'res_model': $.summernote.options.res_model,
+                        'is_image': false,
                     },
                 })
             }

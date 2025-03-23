@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
-    <t t-name="wysiwyg.widgets.audio">
-    
+    <t t-name="wysiwyg.widgets.audio">    
         <div class="o_wysiwyg_audio_dialog">
             <div class="o_audio_dialog">
                 <div class="form-group">
+                    <div style="margin-bottom: 10px;">
+                        <span class="record-dot" style="font-size: 18px; color: red; font-weight: bold; display: none; margin-left: 8px">●</span>
+                        <span class="record-timer" style="font-size: 18px; color: red; font-weight: bold; display: none;">00:00</span>
+                    </div>
                     <div>
                         <audio class="recorded" autoplay="autoplay" playsinline="playsinline" controls="controls"></audio>
                     </div>

@@ -19,16 +19,19 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
         /**
          * @constructor
          */
-        init: function (parent, media, options) {
-            this._super(parent, media, options || {});
+        init: function (parent, media, editable) {
+            this._super(parent, media, editable || {});
             this.constraints = { audio: true, video: true };
             this.mediaRecorder = null;
             this.media = media || null;
             this.recordedBlobs = [];
+            this.editable = editable;
         },
 
         start: function () {
             recordedBlobs = [];
+            this.timerDisplay = this.$('.record-timer');
+            this.recordDot = this.$('.record-dot');
             this.gumVideo = this.$('video.gum').get(0);
             this.startButton = this.$('button.note-record-btn');
             this.stopButton = this.$('button.note-record-stop-btn');
@@ -102,6 +105,8 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
         
         _onClickStart: function (ev) {
             recordedBlobs = [];
+            this._startTimer();
+            this._showRecordDot();
             var options = { mimeType: 'video/webm;codecs=vp9', bitsPerSecond: 100000 };
 
             try {
@@ -135,11 +140,45 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
 
         _onClickStop: function (ev) {
             this.mediaRecorder.stop();
+            this._stopTimer();
+            this._hideRecordDot();
             ev.currentTarget.disabled = true;
             this.playButton.get(0).disabled = false;
             this.startButton.get(0).disabled = false;
             this.downloadButton.get(0).disabled = false
         },
+
+        _startTimer: function () {
+            let seconds = 0;
+            let minutes = 0;
+            let self = this;
+            this.timerDisplay.show();
+            this.timerDisplay.text('00:00');
+    
+            this.timerInterval = setInterval(() => {
+                seconds++;
+                if (seconds === 60) {
+                    minutes++;
+                    seconds = 0;
+                }
+                let formattedTime = (minutes < 10 ? '0' : '') + minutes + ':' + (seconds < 10 ? '0' : '') + seconds;
+                self.timerDisplay.text(formattedTime);
+            }, 1000);
+        },
+    
+        _stopTimer: function () {
+            clearInterval(this.timerInterval);
+            this.recordedTime = this.timerDisplay.text();
+        },
+        
+        _showRecordDot: function () {
+            this.recordDot.show();
+        },
+
+        _hideRecordDot: function () {
+            this.recordDot.hide();
+        },
+        
         handleDataAvailable: function (event) {
             if (event.data && event.data.size > 0) {
                 recordedBlobs.push(event.data);
@@ -182,22 +221,17 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
                     });
                 }
                 this.final_data = attachmentObj;
-                let url = window.location.origin + '/web/content/' + attachmentObj.id + '?controls=1';
-                let videoUrl = `
-                    <div class="media_iframe_video iframe_custom o_we_selected_image">
-                        <div class="media_iframe_video_size" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
-                        <video controls="controls">
-                            <source src="${url}" type="video/webm" />
-                        </video>
-                    </div><br/>`;
-                var pTag = this.editable.find('p');
-                if (pTag.length > 1) {
-                    pTag.last().append(videoUrl);
-                } else {
-                    pTag.append(videoUrl);
-                }
+                let src = window.location.origin + '/web/content/' + attachmentObj.id + '?controls=1';
+                const videoUrl = $(
+                    '<div class="media_iframe_video" data-oe-expression="' + src + '">' +
+                        '<div class="css_editable_mode_display">&nbsp;</div>' +
+                        '<video src="' + src + '" controls="controls" frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen"></video>' +
+                    '</div>'
+                );
+                this.$media = videoUrl;
+                this.media = this.$media[0];
             }
-            this.close();
+            return Promise.resolve(this.media);
         },
 
         destroy: function () {
@@ -229,8 +263,7 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
                     params: {
                         'name': 'recording.webm',
                         'data': bs64Video.split(',')[2],
-                        'res_id': this.defaultOptions.res_id,
-                        'res_model': this.defaultOptions.res_model,
+                        'is_image': false,
                     },
                 })
             }
