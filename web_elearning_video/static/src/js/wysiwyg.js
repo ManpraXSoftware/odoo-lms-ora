@@ -9,6 +9,7 @@ odoo.define('web_elearning_video.wysiwyg', function (require) {
     wysiwyg.include({
         _getCommands: function () {
             const commands = this._super.apply(this, arguments);
+            var self = this;
             commands.push({
                 groupName: _t('Medias'),
                 title: _t('Video'),
@@ -26,9 +27,8 @@ odoo.define('web_elearning_video.wysiwyg', function (require) {
                 callback: () => {
                     new AudioInsertDialog(this, {
                         onAudioInsert: function (audioUrl) {
-                            // Insert the audio in the editor
                             let audioTag = `<audio controls><source src="${audioUrl}" type="audio/mpeg"></audio>`;
-                            this.editor.execCommand('insertHTML', false, audioTag);
+                            self.odooEditor.execCommand('insertHTML', audioTag);
                         },
                     }).open();
                 },

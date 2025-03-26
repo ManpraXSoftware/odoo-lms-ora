@@ -222,12 +222,14 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
                 }
                 this.final_data = attachmentObj;
                 let src = window.location.origin + '/web/content/' + attachmentObj.id + '?controls=1';
-                const videoUrl = $(
-                    '<div class="media_iframe_video" data-oe-expression="' + src + '">' +
-                        '<div class="css_editable_mode_display">&nbsp;</div>' +
-                        '<video src="' + src + '" controls="controls" frameborder="0" contenteditable="false" allowfullscreen="allowfullscreen"></video>' +
-                    '</div>'
-                );
+                const videoUrl = $(`
+                    <div class="" data-oe-expression="${src}">
+                        <div class="media_iframe_video_size" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
+                        <video controls="controls">
+                            <source src="${src}" type="video/webm" />
+                        </video>
+                    </div>
+                `);
                 this.$media = videoUrl;
                 this.media = this.$media[0];
             }

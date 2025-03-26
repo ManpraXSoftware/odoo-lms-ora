@@ -15,7 +15,7 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
             'click .note-audio-download': '_onDownloadAudio',
         },
 
-        init: function (parent, media, editable) {
+        init: function (parent, media) {
             this._super(parent, _.extend({}, {
                 title: _t("Add Audio"),
                 buttons: [{ text: _t("Add"), classes: 'btn-primary', click: this.save },{ text: _t("Discard"), classes: 'btn-secondary', close: true }],
@@ -23,7 +23,7 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
             this.constraints = { audio: true, video: false };
             this.mediaRecorder;
             this.media = media;
-            this.editable = editable;
+            this.editable = parent.$editable;
         },
         start: function () {
             recordedBlobs = [];
@@ -141,27 +141,20 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
                 }
                 this.final_data = attachmentObj;
                 let src = window.location.origin + '/web/content/' + attachmentObj.id + '?autoplay=0&controls=1';
-                const audioUrl = $(
-                    '<div class="media_iframe_audio" data-oe-expression="' + src + '">' +
-                        '<div class="css_editable_mode_display">&nbsp;</div>' +
-                        '<audio src="' + src + '" controls="controls" frameborder="0" contenteditable="false""></audio>' +
-                    '</div>'
-                );
-                this.$media = audioUrl;
-                this.media = this.$media[0];
-                    
+                this.media.onAudioInsert(src);
             }
+            this.close();
             return Promise.resolve(this.media);
         },
 
-        destroy: function () {
-            if (typeof (window.stream) == "object") {
-                window.stream.getTracks().forEach((track) => {
-                    track.stop();
-                });
-            }
-            return this._super(...arguments);
-        },
+        // destroy: function () {
+        //     if (typeof (window.stream) == "object") {
+        //         window.stream.getTracks().forEach((track) => {
+        //             track.stop();
+        //         });
+        //     }
+        //     return this._super(...arguments);
+        // },
         blobToBase64: blob => {
             const reader = new FileReader();
             reader.readAsDataURL(blob);
