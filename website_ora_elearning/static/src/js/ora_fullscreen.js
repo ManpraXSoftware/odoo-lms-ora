@@ -52,12 +52,12 @@
                 slideData.isOra = !!slideData.isOra;
                 slideData.hasQuestion = !!slideData.hasQuestion;
                 try {
-                    if (!(slideData.isOra) && !(slideData.hasQuestion)) {
+                    if (!(slideData.isOra) && !(slideData.hasQuestion) && slideData.category != 'certification') {
                         slideData._autoSetDone = true;
                     }
                 }
                 catch {
-                    if (!(slideData.hasQuestion)) {
+                    if (!(slideData.hasQuestion) && slideData.category != 'certification') {
                         slideData._autoSetDone = true;
                     }
                 }
