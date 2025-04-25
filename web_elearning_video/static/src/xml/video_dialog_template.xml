@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates id="template" xml:space="preserve">
+    <t t-name="web_elearning_video.VideoSelector" t-inherit="web_editor.VideoSelector" t-inherit-mode="extension" owl="1">
+        <!-- Replace the video dialog form with recording controls -->
+        <xpath expr="//div[@class='row']/div[@class='col mt-4 o_video_dialog_form']" position="replace">
+            <div class="form-group mt-3" style="margin-inline: auto;">
+                <div style="margin-bottom: 10px; display: flex;">
+                    <span class="record-dot" style="font-size: 24px; color: red; font-weight: bold;">●</span>
+                    <span class="record-timer" style="font-size: 24px; color: red; font-weight: bold; margin-left: 6px;">00:00</span>
+                </div>
+                <div class="videos" style="display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <video class="gum" autoplay="true" muted="true" playsinline="true" style="width: 49%;"></video>
+                    <video class="note-video-input" playsinline="true" controls="true" style="width: 49%; background: #222;"></video>
+                </div>
+                <div>
+                    <button t-on-click="onStartRecording" class="note-record-btn btn btn-primary">Start</button>
+                    <button t-on-click="onStopRecording" class="note-record-stop-btn btn btn-primary" disabled="disabled">Stop</button>
+                    <button t-on-click="onPlayVideo" class="note-video-play btn btn-primary" disabled="disabled">Play</button>
+                    <button t-on-click="onDownloadVideo" class="note-video-download btn btn-primary" disabled="disabled">Download</button>
+                </div>
+            </div>
+        </xpath>
+        <!-- Remove the right column (search/preview) -->
+        <xpath expr="//div[@class='row']/div[@class='col-md-6']" position="replace"/>
+    </t>
+</templates>
