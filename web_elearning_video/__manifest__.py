@@ -17,8 +17,6 @@
             'web_elearning_video/static/src/js/video_dialog.js',
             'web_elearning_video/static/src/js/audio_dialog.js',
             'web_elearning_video/static/src/xml/audio_dialog_template.xml',
-        ],
-        'web.assets_backend': [
             'web_elearning_video/static/src/xml/video_dialog_template.xml',
         ],
     },

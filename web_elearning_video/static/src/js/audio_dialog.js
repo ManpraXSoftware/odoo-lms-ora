@@ -267,7 +267,6 @@ export class AudioDialog extends Component {
                 'data': bs64Audio.split(',')[1],
                 'is_image': false,
             });
-            console.log("RPC Response:", audioAttachment);
         }
         return audioAttachment;
     }
