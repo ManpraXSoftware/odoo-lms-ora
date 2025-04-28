@@ -1,16 +1,19 @@
 /** @odoo-module **/
 
-import { VideoSelector } from '@web_editor/components/media_dialog/video_selector';
-import { patch } from '@web/core/utils/patch';
-import { onMounted, onWillUnmount } from '@odoo/owl';
-import { MediaDialog } from '@web_editor/components/media_dialog/media_dialog';
-import { useService } from '@web/core/utils/hooks';
+import { Component, useState, useRef, onMounted, xml, onRendered, onWillUnmount} from "@odoo/owl";
+import { Mutex } from "@web/core/utils/concurrency";
+import { Dialog } from '@web/core/dialog/dialog';
+import { useWowlService } from '@web/legacy/utils';
+import { useService } from "@web/core/utils/hooks";
 
-let recordedBlobs = [];
-patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
+export class VideoDialog extends Component {
     setup() {
+        this.rpc = useService("rpc");
+        this.mutex = new Mutex();
+        this.notificationService = useService("notification");
         this.constraints = { audio: true, video: true };
         this.mediaRecorder = null;
+        this.recordedBlobs = [];
         this.notificationService = useService("notification");
         onMounted(this._setupVideoElements.bind(this));
         onWillUnmount(() => {
@@ -23,9 +26,9 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
             if (this.timerInterval) {
                 clearInterval(this.timerInterval);
             }
-            recordedBlobs = [];
+            this.recordedBlobs = [];
         });
-    },
+    }
 
     _setupVideoElements() {
         this.$gumVideo = document.querySelector('.gum');
@@ -54,9 +57,9 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
             self._showCameraErrorMessage();
             self._hideControlButtons();
         });
-    },
+    }
 
-    _showCameraErrorMessage: function () {
+    _showCameraErrorMessage() {
         var videoContainer = $('div.videos');
         if (videoContainer.length === 0) {
             console.error("Error: Video container not found.");
@@ -80,41 +83,40 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
         if (this.$recordTimer) {
             this.$recordTimer.style.display = 'none';
         }
-    },
+    }
 
     /**
      * Hide control buttons when the camera is not enabled.
      */
-    _hideControlButtons: function () {
+    _hideControlButtons() {
         this.startBtn.hide();
         this.stopBtn.hide();
         this.playBtn.hide();
         this.downloadBtn.hide();
-    },
+    }
 
     /**
      * Show control buttons when the camera is enabled.
      */
-    _showControlButtons: function () {
+    _showControlButtons() {
         this.startBtn.show();
         this.stopBtn.show();
         this.playBtn.show();
         this.downloadBtn.show();
-    },
+    }
     
     async onStartRecording() {
+        this.recordedBlobs = [];
         try {
-            recordedBlobs = [];
-            // this.recordedBlobs = [];
             this.mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data && event.data.size > 0) {
-                    recordedBlobs.push(event.data);
+                    this.recordedBlobs.push(event.data);
                 }
             };
             this.mediaRecorder.onstop = () => {
                 // Create blob for recorded video
-                const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+                const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
                 if (this.$recordedVideo) {
                     this.$recordedVideo.src = window.URL.createObjectURL(blob);
                     this.$recordedVideo.muted = false;
@@ -151,7 +153,7 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
                 type: 'danger',
             });
         }
-    },
+    }
 
     onStopRecording() {
         this.mediaRecorder.stop();
@@ -164,16 +166,16 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
         this.stopBtn[0].disabled = true;
         this.playBtn[0].disabled = false;
         this.downloadBtn[0].disabled = false;
-    },
-
+    }
+    
     onPlayVideo() {
         if (this.$recordedVideo) {
             this.$recordedVideo.play();
         }
-    },
+    }
 
     onDownloadVideo() {
-        const blob = new Blob(recordedBlobs, { type: 'video/webm' });
+        const blob = new Blob(this.recordedBlobs, { type: 'video/webm' });
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.style.display = 'none';
@@ -185,32 +187,22 @@ patch(VideoSelector.prototype, 'web_elearning_video.VideoSelector', {
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
         }, 100);
-    },
-    getRecordedBlobs() {
-        return this.recordedBlobs;
-    },
-});
-
-patch(MediaDialog.prototype, 'web_elearning_video.MediaDialog', {
-    setup() {
-        this._super();
-        this.uploadService = useService('upload');
-    },
+    }
 
     async save() {
         // Validate recording blob existence
-        if (!recordedBlobs || recordedBlobs.length === 0) {
+        if (!this.recordedBlobs || this.recordedBlobs.length === 0) {
             this.notificationService.add("No video recorded to save.", {
                 type: 'danger',
             });
             return;
         }
     
-        const saveRecordedVideo = recordedBlobs.length > 0;
+        const saveRecordedVideo = this.recordedBlobs.length > 0;
     
         if (saveRecordedVideo) {
             const elements = await this.mutex.exec(async () => {
-                const attachmentObj = await this.addAttachment(recordedBlobs);
+                const attachmentObj = await this.addAttachment(this.recordedBlobs);
                 if (!attachmentObj || !attachmentObj.id) {
                     this.notificationService.add("Failed to upload the recorded video.", {
                         type: 'danger',
@@ -272,7 +264,7 @@ patch(MediaDialog.prototype, 'web_elearning_video.MediaDialog', {
         }
     
         this.props.close();
-    },
+    }
     
     async blobToBase64(blob) {
         return new Promise(resolve => {
@@ -280,7 +272,7 @@ patch(MediaDialog.prototype, 'web_elearning_video.MediaDialog', {
             reader.onloadend = () => resolve(reader.result);
             reader.readAsDataURL(blob);
         });
-    },
+    }
     
     async addAttachment(blobs) {
         if (!blobs.length) return null;
@@ -294,5 +286,125 @@ patch(MediaDialog.prototype, 'web_elearning_video.MediaDialog', {
         console.log("RPC Response:", response);
         return response;
     }
+
+    // async save() {
+    //     if (!this.recordedBlobs || this.recordedBlobs.length === 0) {
+    //         this.notificationService.add("No Audio recorded to save.", {
+    //             type: 'danger',
+    //         });
+    //         return;
+    //     }
+    //     const saveRecordedVideo = this.recordedBlobs.length > 0;
+    //     if (saveRecordedVideo) {
+    //         const elements = await this.mutex.exec(async () => {
+    //             const attachmentObj = await this.addAttachment(this.recordedBlobs);
+    //             if (!attachmentObj || !attachmentObj.id) {
+    //                 this.notificationService.add("Failed to upload the recorded video.", {
+    //                     type: 'danger',
+    //                 });
+    //                 return [];
+    //             }
     
-});
+    //             // Stop the stream if exists
+    //             if (typeof window.stream === "object") {
+    //                 window.stream.getTracks().forEach(track => track.stop());
+    //             }
+    
+    //             // Clear the temporary video source
+    //             const recordedVideo = $('audio.recorded');
+    //             if (recordedVideo && recordedVideo.length) {
+    //                 recordedVideo.get(0).removeAttribute('src');
+    //                 recordedVideo.get(0).load();
+    //             }
+    
+    //             const src = `${window.location.origin}/web/content/${attachmentObj.id}?controls=1`;
+    
+    //             const audioElement = $(`
+    //                 <div class="" data-oe-expression="${src}">
+    //                     <div class="media_iframe_video_size" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
+    //                     <audio controls="controls">
+    //                         <source src="${src}" type="video/webm" />
+    //                     </audio>
+    //                 </div>
+    //             `)[0];
+    
+    //             if (this.props.media) {
+    //                 audioElement.classList.add(...this.props.media.classList);
+    //                 const style = this.props.media.getAttribute('style');
+    //                 if (style) {
+    //                     audioElement.setAttribute('style', style);
+    //                 }
+    //                 const parentEl = this.props.media.parentElement;
+    //                 if (
+    //                     parentEl &&
+    //                     parentEl.tagName === "A" &&
+    //                     parentEl.children.length === 1 &&
+    //                     this.props.media.tagName === "IMG"
+    //                 ) {
+    //                     parentEl.replaceWith(parentEl.firstElementChild);
+    //                 }
+    //             }
+    
+    //             return [audioElement];
+    //         });
+    
+    //         if (elements && elements.length) {
+    //             if (this.props.multiImages) {
+    //                 await this.props.save(elements);
+    //             } else {
+    //                 await this.props.save(elements[0]);
+    //             }
+    //         }
+    //     }
+    //     // Close the dialog or perform additional actions
+    //     this.props.close();
+    // }
+    
+    // // Additional helper methods remain the same
+    
+    // async blobToBase64(blob) {
+    //     const reader = new FileReader();
+    //     reader.readAsDataURL(blob);
+    //     return new Promise(resolve => {
+    //         reader.onloadend = () => {
+    //             resolve(reader.result);
+    //         };
+    //     });
+    // }
+    
+    // async addAttachment() {
+    //     let audioAttachment;
+    //     if (this.recordedBlobs) {
+    //         let type = (this.recordedBlobs[0] || {}).type;
+    //         let superBuffer = new Blob(this.recordedBlobs, { type });
+    //         const bs64Audio = await this.blobToBase64(superBuffer);
+    //         audioAttachment = await this.rpc('/web_editor/attachment/add_data', {
+    //             'name': 'recording.webm',
+    //             'data': bs64Audio.split(',')[1],
+    //             'is_image': false,
+    //         });
+    //         console.log("RPC Response:", audioAttachment);
+    //     }
+    //     return audioAttachment;
+    // }
+    
+}
+VideoDialog.template = 'web_elearning_video.VideoDialog';
+VideoDialog.defaultProps = {
+    useMediaLibrary: true,
+};
+VideoDialog.components = {
+    Dialog,
+};
+
+
+export class VideoDialogWrapper extends Component {
+    setup() {
+        this.dialogs = useWowlService('dialog');
+
+        onRendered(() => {
+            this.dialogs.add(VideoDialog, this.props);
+        });
+    }
+}
+VideoDialogWrapper.template = xml``;
