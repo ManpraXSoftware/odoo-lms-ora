@@ -1,25 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates id="template" xml:space="preserve">
-    <t t-extend="wysiwyg.widgets.video">
-        <t t-jquery="div.o_video_dialog_form" t-operation="replace">
-            <div class="form-group mt-3" style="margin-inline: auto">
-                <div style="margin-bottom: 10px;">
-                    <span class="record-dot" style="font-size: 24px; color: red; font-weight: bold; display: none;">●</span>
-                    <span class="record-timer" style="font-size: 24px; color: red; font-weight: bold; display: none;">00:00</span>
-                </div>
-                <div class="videos" style="display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
-                    <video class="gum" autoplay="autoplay" muted="muted" playsinline="playsinline" style="width: 49%;"></video>
-                    <video class="note-video-input" autoplay="autoplay" playsinline="playsinline" controls="controls" style="width: 49%; background: #222;"></video>
-                </div>
-                
-                <div>
-                    <button class="note-record-btn btn btn-primary">Start</button>
-                    <button class="note-record-stop-btn btn btn-primary" disabled="disabled">Stop</button>
-                    <button class="note-video-play btn btn-primary" disabled="disabled">Play</button>
-                    <button class="note-video-download btn btn-primary" disabled="disabled">Download</button>
-                </div>
+    <t t-name="wysiwyg.widgets.video.recorder">
+        <div class="form-group mt-3" style="margin-inline: auto">
+            <div style="margin-bottom: 10px;">
+                <span class="record-dot" style="font-size: 24px; color: red; font-weight: bold; display: none;">●</span>
+                <span class="record-timer" style="font-size: 24px; color: red; font-weight: bold; display: none;">00:00</span>
             </div>
-        </t>
-        <t t-jquery="div.col-md-6" t-operation="replace" />
+            <div class="videos" style="display: flex; justify-content: flex-start; gap: 10px; margin-bottom: 10px; flex-wrap: wrap;">
+                <video class="gum" autoplay="autoplay" muted="muted" playsinline="playsinline" style="width: 49%;"></video>
+                <video class="note-video-input" autoplay="autoplay" playsinline="playsinline" controls="controls" style="width: 49%; background: #222;"></video>
+            </div>
+            
+            <div>
+                <button class="note-record-btn btn btn-primary">Start</button>
+                <button class="note-record-stop-btn btn btn-primary" disabled="disabled">Stop</button>
+                <button class="note-video-play btn btn-primary" disabled="disabled">Play</button>
+                <button class="note-video-download btn btn-primary" disabled="disabled">Download</button>
+            </div>
+        </div>
     </t>
 </templates>

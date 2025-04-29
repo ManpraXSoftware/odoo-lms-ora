@@ -5,18 +5,26 @@ odoo.define('web_elearning_video.wysiwyg', function (require) {
     var core = require('web.core');
     var _t = core._t;
     var AudioInsertDialog = require('web_elearning_video.AudioInsertDialog');
-    
+    var VideoInsertDialog = require('web_elearning_video.VideoInsertDialog');
+
     wysiwyg.include({
         _getCommands: function () {
             const commands = this._super.apply(this, arguments);
             var self = this;
             commands.push({
                 groupName: _t('Medias'),
-                title: _t('Video'),
+                title: _t('Video Recorder'),
                 description: _t('Insert a video file.'),
                 fontawesome: 'fa-file-video-o',
                 callback: () => {
-                    this.openMediaDialog({noVideos: false, noImages: true, noIcons: true, noDocuments: true});
+                    new VideoInsertDialog(this, {
+                        onVideoInsert: function (videoUrl, mimeType) {
+                            // Default to MP4, fallback to WebM based on mimeType
+                            let videoType = mimeType && mimeType.includes('mp4') ? 'video/mp4' : 'video/webm';
+                            let videoTag = `<video controls><source src="${videoUrl}" type="${videoType}"></video>`;
+                            self.odooEditor.execCommand('insertHTML', videoTag);
+                        },
+                    }).open();
                 },
             });
             commands.push({

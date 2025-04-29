@@ -1,14 +1,16 @@
-odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
+odoo.define('web_elearning_video.VideoInsertDialog', function (require) {
     'use strict';
 
-    var widgetsMedia = require('wysiwyg.widgets.media');
+    var Dialog = require('web.Dialog');
+    var core = require('web.core');
+    var _t = core._t;
     var recordedBlobs = [];
 
-    widgetsMedia.VideoWidget.include({
-        xmlDependencies: widgetsMedia.VideoWidget.prototype.xmlDependencies.concat(
+    var VideoInsertDialog = Dialog.extend({
+        template: 'wysiwyg.widgets.video.recorder',
+        xmlDependencies: Dialog.prototype.xmlDependencies.concat(
             ['/web_elearning_video/static/src/xml/video_dialog_template.xml']
         ),
-
         events: {
             'click .note-record-btn': '_onClickStart',
             'click .note-record-stop-btn': '_onClickStop',
@@ -16,16 +18,15 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
             'click .note-video-download': '_onDownloadVideo',
         },
 
-        /**
-         * @constructor
-         */
-        init: function (parent, media, editable) {
-            this._super(parent, media, editable || {});
+        init: function (parent, media) {
+            this._super(parent, _.extend({}, {
+                title: _t("Add Video"),
+                buttons: [{ text: _t("Add"), classes: 'btn-primary', click: this.save },{ text: _t("Discard"), classes: 'btn-secondary', close: true }],
+            }, {}));
             this.constraints = { audio: true, video: true };
             this.mediaRecorder = null;
             this.media = media || null;
-            this.recordedBlobs = [];
-            this.editable = editable;
+            this.editable = parent.$editable;
         },
 
         start: function () {
@@ -222,17 +223,9 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
                 }
                 this.final_data = attachmentObj;
                 let src = window.location.origin + '/web/content/' + attachmentObj.id + '?controls=1';
-                const videoUrl = $(`
-                    <div class="" data-oe-expression="${src}">
-                        <div class="media_iframe_video_size" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
-                        <video controls="controls">
-                            <source src="${src}" type="video/webm" />
-                        </video>
-                    </div>
-                `);
-                this.$media = videoUrl;
-                this.media = this.$media[0];
+                this.media.onVideoInsert(src);
             }
+            this.close();
             return Promise.resolve(this.media);
         },
 
@@ -272,4 +265,5 @@ odoo.define('wysiwyg.widgets.VideoDialog', function (require) {
             return videoAttachment;
         }
     });
+    return VideoInsertDialog;
 });

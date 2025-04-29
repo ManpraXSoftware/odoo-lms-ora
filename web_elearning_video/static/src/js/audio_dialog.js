@@ -8,6 +8,9 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
 
     var AudioInsertDialog = Dialog.extend({
         template: 'wysiwyg.widgets.audio',
+        xmlDependencies: Dialog.prototype.xmlDependencies.concat(
+            ['/web_elearning_video/static/src/xml/audio_dialog_template.xml']
+        ),
         events: {
             'click .note-record-audio-btn': '_onClickStart',
             'click .note-record-stop-btn': '_onClickStop',
@@ -147,14 +150,15 @@ odoo.define('web_elearning_video.AudioInsertDialog', function (require) {
             return Promise.resolve(this.media);
         },
 
-        // destroy: function () {
-        //     if (typeof (window.stream) == "object") {
-        //         window.stream.getTracks().forEach((track) => {
-        //             track.stop();
-        //         });
-        //     }
-        //     return this._super(...arguments);
-        // },
+        destroy: function () {
+            if (typeof (window.stream) == "object") {
+                window.stream.getTracks().forEach((track) => {
+                    track.stop();
+                });
+            }
+            return this._super(...arguments);
+        },
+
         blobToBase64: blob => {
             const reader = new FileReader();
             reader.readAsDataURL(blob);
