@@ -14,17 +14,6 @@ Wysiwyg.include({
         const { commands, categories } = options;
 
         categories.push({ name: _t('Media'), priority: 50 });
-
-        // commands.push({
-        //     category: _t('Media'),
-        //     name: _t('Video'),
-        //     description: _t('Insert a video.'),
-        //     fontawesome: 'fa-file-video-o',
-        //     callback: () => {
-        //         this.openMediaDialog({ noVideos: false, noImages: true, noIcons: true, noDocuments: true });
-        //     },
-        // });
-
         commands.push({
             category: _t('Media'),
             name: _t('Video Recorder'),

@@ -277,10 +277,10 @@ export class VideoDialog extends Component {
     async addAttachment(blobs) {
         if (!blobs.length) return null;
         const superBuffer = new Blob(blobs, { type: 'video/webm' });
-        const bs64Audio = await this.blobToBase64(superBuffer);
+        const bs64Video = await this.blobToBase64(superBuffer);
         const response = await this.rpc('/web_editor/attachment/add_data', {
             name: 'recording.webm',
-            data: bs64Audio.split(',')[1],
+            data: bs64Video.split(',')[1],
             is_image: false,
         });
         return response;
