@@ -225,7 +225,8 @@ export class VideoDialog extends Component {
                 const src = `${window.location.origin}/web/content/${attachmentObj.id}?controls=1`;
     
                 const videoElement = $(`
-                    <div class="" data-oe-expression="${src}">
+                    <div class="media_iframe_video" data-oe-expression="${src}">
+                        <div class="css_editable_mode_display"/>
                         <div class="media_iframe_video_size" contenteditable="false" style="padding-bottom:10px;">&nbsp;</div>
                         <video controls="controls">
                             <source src="${src}" type="video/webm" />

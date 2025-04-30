@@ -13,9 +13,9 @@
                     </div>
                     <div style="margin-top: 20px;margin-left: 10px;">
                         <button class="note-record-btn btn btn-primary" t-on-click="onStartRecording">Start</button>
-                        <button class="note-record-stop-btn btn btn-primary" t-on-click="onStopRecording" disabled="disabled">Stop</button>
-                        <button class="note-video-play btn btn-primary" t-on-click="onPlayAudio" disabled="disabled">Play</button>
-                        <button class="note-video-download btn btn-primary" t-on-click="onDownloadAudio" disabled="disabled">Download</button>
+                        <button class="note-record-stop-btn btn btn-primary" t-on-click="onStopRecording" disabled="disabled" style="margin-left: 5px;">Stop</button>
+                        <button class="note-video-play btn btn-primary" t-on-click="onPlayAudio" disabled="disabled" style="margin-left: 5px;">Play</button>
+                        <button class="note-video-download btn btn-primary" t-on-click="onDownloadAudio" disabled="disabled" style="margin-left: 5px;">Download</button>
                     </div>
                 </div>
             </div>
