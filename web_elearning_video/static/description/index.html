@@ -46,22 +46,44 @@
             color: #4a5568;
             margin-bottom: 1.5rem;
         }
+        .key-highlights {
+            text-align: center; /* Center the h2 and content */
+        }
         .key-highlights h2 {
             font-size: 1.75rem;
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem; /* Increased margin for better spacing */
         }
-        .key-highlights ul {
-            list-style: none;
-            padding: 0;
-        }
-        .key-highlights li {
+        .highlight-row {
             display: flex;
-            align-items: center;
-            padding: 0.75rem 0;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 0 auto; /* Ensure horizontal centering */
+        }
+        .highlight-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem; /* Increased padding for larger appearance */
+            text-align: left;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid #2b6cb0;
+            flex: 1;
+            min-width: 300px; /* Increased from 250px */
+            max-width: 400px; /* Increased from 350px */
+        }
+        .highlight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        .highlight-card p {
             font-size: 1.125rem;
             color: #4a5568;
+            margin: 0;
+            display: flex;
+            align-items: center;
         }
         .key-highlights i {
             color: #2b6cb0;
@@ -169,7 +191,7 @@
             .main-section h3 {
                 font-size: 1.25rem;
             }
-            .contact-card {
+            .contact-card, .highlight-card {
                 min-width: 100%;
                 margin-bottom: 1.5rem;
             }
@@ -191,13 +213,23 @@
             <h3>Enhance the Odoo HTML Editor with a WYSIWYG Editor</h3>
             <div class="key-highlights">
                 <h2>Key Highlights</h2>
-                <ul>
-                    <li><i class="fas fa-check-circle"></i>Add audio and video recording capabilities to the Odoo HTML Editor.</li>
-                    <li><i class="fas fa-check-circle"></i>Record and embed audio directly within the editor.</li>
-                    <li><i class="fas fa-check-circle"></i>Record and embed video directly within the editor.</li>
-                    <li><i class="fas fa-check-circle"></i>Download recorded audio or video for preview or external use.</li>
-                    <li><i class="fas fa-check-circle"></i>Access recording icons by default in Odoo Studio’s HTML editor.</li>
-                </ul>
+                <div class="highlight-row">
+                    <div class="highlight-card">
+                        <p><i class="fas fa-check-circle"></i>Add audio and video recording capabilities to the Odoo HTML Editor.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <p><i class="fas fa-check-circle"></i>Record and embed audio directly within the editor.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <p><i class="fas fa-check-circle"></i>Record and embed video directly within the editor.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <p><i class="fas fa-check-circle"></i>Download recorded audio or video for preview or external use.</p>
+                    </div>
+                    <div class="highlight-card">
+                        <p><i class="fas fa-check-circle"></i>Access recording icons by default in Odoo Studio’s HTML editor.</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
