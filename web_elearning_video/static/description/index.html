@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Enhance the Odoo HTML Editor with audio and video recording features using ManpraX's WYSIWYG editor solution.">
+    <title>ManpraX Documentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #1a202c;
+            background-color: #f7fafc;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .logo-section {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .logo-section img {
+            max-width: 250px;
+            height: auto;
+        }
+        .main-section {
+            padding: 3rem 0;
+        }
+        .main-section h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+        }
+        .main-section h3 {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 1.5rem;
+        }
+        .key-highlights h2 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        .key-highlights ul {
+            list-style: none;
+            padding: 0;
+        }
+        .key-highlights li {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 0;
+            font-size: 1.125rem;
+            color: #4a5568;
+        }
+        .key-highlights i {
+            color: #2b6cb0;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+        .screenshots-section h2 {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 2rem 0;
+        }
+        .screenshot {
+            margin: 1.5rem 0;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        .screenshot h3 {
+            font-size: 1.125rem;
+            font-weight: 400;
+            color: #4a5568;
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .screenshot i {
+            color: #2b6cb0;
+            margin-right: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .screenshot img {
+            max-width: 80%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            border-radius: 8px;
+        }
+        .contact-section, .enquiries-section {
+            padding: 3rem 0;
+            background: #ffffff;
+            border-radius: 8px;
+            margin: 2rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .contact-section h4, .enquiries-section h4 {
+            text-align: center;
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        .contact-section hr, .enquiries-section hr {
+            width: 100px;
+            border: 2px solid #805ad5;
+            margin: 0 auto 2rem;
+        }
+        .contact-row {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .contact-card {
+            background: #f7fafc;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-top: 4px solid #2b6cb0;
+            flex: 1;
+            min-width: 250px;
+            max-width: 350px;
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+        .contact-card h5 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 1rem;
+        }
+        .contact-card a {
+            display: block;
+            padding: 0.75rem;
+            background-color: #2b6cb0;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .contact-card a:hover {
+            background-color: #2c5282;
+        }
+        @media (max-width: 768px) {
+            .main-section h1 {
+                font-size: 2rem;
+            }
+            .main-section h3 {
+                font-size: 1.25rem;
+            }
+            .contact-card {
+                min-width: 100%;
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="logo-section">
+        <div class="container">
+            <a href="https://www.manprax.com/" target="_blank" aria-label="Visit ManpraX Software LLP website">
+                <img src="images/manprax.png" alt="ManpraX Software LLP Logo">
+            </a>
+        </div>
+    </div>
+
+    <div class="main-section">
+        <div class="container">
+            <h1>Record and Embed Audio or Video in the HTML Editor</h1>
+            <h3>Enhance the Odoo HTML Editor with a WYSIWYG Editor</h3>
+            <div class="key-highlights">
+                <h2>Key Highlights</h2>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i>Add audio and video recording capabilities to the Odoo HTML Editor.</li>
+                    <li><i class="fas fa-check-circle"></i>Record and embed audio directly within the editor.</li>
+                    <li><i class="fas fa-check-circle"></i>Record and embed video directly within the editor.</li>
+                    <li><i class="fas fa-check-circle"></i>Download recorded audio or video for preview or external use.</li>
+                    <li><i class="fas fa-check-circle"></i>Access recording icons by default in Odoo Studio’s HTML editor.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="screenshots-section">
+        <div class="container">
+            <h2>Screenshots</h2>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Post-installation, audio and video recording icons appear in the Odoo HTML Editor.</h3>
+                <img src="images/img2.png" alt="Audio and Video Recording Icons in Odoo HTML Editor">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Click the video recording icon to request camera access and begin recording.</h3>
+                <img src="images/img3.png" alt="Video Recording Camera Permission Prompt">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Preview or download the recorded video before embedding.</h3>
+                <img src="images/img4.png" alt="Video Preview and Download Interface">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Click Save to embed the video in the editor.</h3>
+                <img src="images/img5.png" alt="Embed Video in Odoo HTML Editor">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Click the audio recording icon to request microphone access and start recording.</h3>
+                <img src="images/img6.png" alt="Audio Recording Microphone Permission Prompt">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Preview or download the recorded audio before embedding.</h3>
+                <img src="images/img7.png" alt="Audio Preview and Download Interface">
+            </div>
+            <div class="screenshot">
+                <h3><i class="fas fa-check-circle"></i>Click Save to embed the audio in the editor.</h3>
+                <img src="images/img8.png" alt="Embed Audio in Odoo HTML Editor">
+            </div>
+        </div>
+    </div>
+
+    <div class="contact-section">
+        <div class="container">
+            <h4>Need Help?</h4>
+            <hr>
+            <div class="contact-row">
+                <div class="contact-card">
+                    <h5>Visit Us</h5>
+                    <a href="https://manprax.com" target="_blank" aria-label="Visit ManpraX Software LLP website">ManpraX Software LLP Website</a>
+                </div>
+                <div class="contact-card">
+                    <h5>Contact Us on WhatsApp</h5>
+                    <a href="https://wa.me/+918448440100" target="_blank" aria-label="Message ManpraX on WhatsApp">Message on WhatsApp</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="enquiries-section">
+        <div class="container">
+            <h4>Enquiries</h4>
+            <hr>
+            <div class="contact-row">
+                <div class="contact-card">
+                    <h5>Business Enquiries</h5>
+                    <a href="mailto:sales@manprax.com" target="_blank" aria-label="Email ManpraX Sales Team">Email Sales</a>
+                </div>
+                <div class="contact-card">
+                    <h5>General Enquiries</h5>
+                    <a href="mailto:info@manprax.com" target="_blank" aria-label="Email ManpraX Support Team">Email Support</a>
+                </div>
+                <div class="contact-card">
+                    <h5>Join the MX Team</h5>
+                    <a href="mailto:apply@manprax.com" target="_blank" aria-label="Apply to join the ManpraX Team">Apply Now</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
