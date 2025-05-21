@@ -5,7 +5,7 @@
     'category': 'Extra Tools',
     'summary': 'Create and play videos/audios on Odoo platform',
     'sequence': 10,
-    'version': '1.2',
+    'version': '1.3',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
     'depends': ['web', 'website', 'website_slides', 'web_editor'],
