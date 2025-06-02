@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_mark_assessed_wizard_form" model="ir.ui.view">
+        <field name="name">mark.assessed.wizard.form</field>
+        <field name="model">mark.assessed.wizard</field>
+        <field name="arch" type="xml">
+            
+            <form string="Confirm Assessment">
+                <group string="Assessment Details">
+                    <field name="response_id" invisible="1" />
+                    <field name="user_response_lines">
+                        <list>
+                            <field name="question_name"/>
+                            <field name="value_combined"/>
+                            <field name="slide_id"/>
+                        </list>
+                    </field>
+                </group>
+
+                <group string="Peer Assessments">
+                    <field name="peer_staff_lines">
+                        <list>
+                            <field name="user_id"/>
+                            <field name="submitted_date"/>
+                            <field name="state"/>
+                            <field name="total_score"/>
+                        </list>
+                    </field>
+                </group>
+
+                <group string="Rubric">
+                    <field name="option_ids">
+                        <list editable="bottom">
+                            <field name="criteria_id"/>
+                            <field name="criteria_desc"/>
+                            <field name="option_id" domain="[('rubric_id', '=', criteria_id)]"/>
+                            <field name="criteria_option_desc"/>
+                            <field name="criteria_option_point"/>
+                            <field name="assess_explanation"/>
+                        </list>
+                    </field>
+                </group>
+
+                <footer>
+                    <button string="Confirm" type="object" name="confirm_assessment" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

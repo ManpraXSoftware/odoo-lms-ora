@@ -39,16 +39,16 @@
                                                 </div>
                                             </t>
                                             <div class="row" style="line-height: 2.3em;">
-                                                <div class="d-flex align-items-start">
+                                                <div class="d-flex align-items-start" style="margin-top: 5px;">
                                                     <div t-attf-class="o_wforum_author_box d-inline-flex o_show_info o_compact align-items-center o_wforum_bio_popover"
                                                     t-att-data-content="bio_popover_data">
                                                         <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                             <img t-attf-class="rounded-circle o_forum_avatar shadow" t-att-src="response.ora_res_user_image_url" alt="Avatar"
-                                                            style="height:40px;width:40px;"/>
+                                                            style="height:40px;width:40px;margin-left:12px;"/>
                                                         </div>
                                                     </div>
                                                     <t t-if="response.state != 'assessed'">
-                                                        <span class="ml-2">Your response has been submitted successfully on
+                                                        <span class="ml-2" style="margin-left: 5px;">Your response has been submitted successfully on
                                                             <t t-esc="response.submitted_date"/>
                                                         </span>
                                                     </t>
@@ -181,7 +181,9 @@
                             </div>
                         </t>
                         <t t-if="! widget.peer_responses || (widget.peer_responses  &amp;&amp; widget.peer_responses.length == 0)">
-                            <h2>There is no peer responses to assess.</h2>
+                            <div style="min-height: 700px; display: flex; justify-content: center; align-items: center;">
+                                <h4 class="text-center">There is no peer responses to assess.</h4>
+                            </div>
                         </t>
                     </div>
                 </div>
@@ -223,12 +225,12 @@
         </div>
     </t>
     <t t-name="lesson_submitted_response_prompts">
-        <div class="o_wslides_js_lesson_ora" id="lessonORA">
+        <div class="o_wslides_js_lesson_ora" style="background-color: #fcfcfd" id="lessonORA">
             <t t-foreach="widget.slide_prompts" t-as="prompt" t-key="prompt">
                 <t t-call="lesson_content_quiz_prompt_submitted"/>
             </t>
             <t t-if="response.state == 'in_progress' and response.user_id == widget.slide.user">
-                <h3>Complete the rubric and submit the assessment.</h3>
+                <h4>Complete the rubric and submit the assessment.</h4>
                 <t t-foreach="widget.slide.rubric_ids" t-as="rubric" t-key="rubric">
                     <ul class="list-group">
                         <li class="list-group-item mb-3">
@@ -293,7 +295,7 @@
         </div>
     </t>
     <t t-name="lesson_assessed_response_prompts">
-        <div class="o_wslides_js_lesson_ora" id="lessonORA">
+        <div class="o_wslides_js_lesson_ora" style="background-color: #fcfcfd" id="lessonORA">
             <t t-foreach="widget.slide_prompts" t-as="prompt" t-key="prompt">
                 <t t-call="lesson_content_quiz_prompt_submitted"/>
             </t>
@@ -347,7 +349,7 @@
             <div class="row mb-2">
                 <div style="display:inline-flex;">
                     <small class="text-muted">
-                        <i class="fa fa-quora me-1"></i>
+                        <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Question <t t-out="prompt['id']" />: </span>
                     </small>
                     <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
                 </div>
@@ -399,12 +401,13 @@
     </t>
     <t t-name="lesson_content_quiz_prompt_submitted">
         <div t-attf-class="o_wslides_js_lesson_quiz_question card-body #{(widget.slide.is_member) and ' ' or  ' disabled'}"
-            t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question">
+            t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-left: 60px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
                     <small class="text-muted">
-                        <i class="fa fa-quora me-1"></i>
+                        <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Question <t t-out="prompt['id']" />: </span>
                     </small>
+                    <br />
                     <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
                 </div>
             </div>
@@ -414,19 +417,24 @@
                         <t t-if="user_input.prompt_id == prompt.id">
                             <t t-if="prompt.response_type == 'text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-1"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <span class="ml-1" style="line-height: 1">
                                     <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
                                 </span>
+                                <br />
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-1"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
+                                <!-- <small class="text-muted">
+                                    <i class="fa fa-font me-1"></i>
+                                </small> -->
                                 <span class="ml-1" style="line-height: 1">
                                     <span t-out="user_input.value_richtext_box"/>
                                 </span>
+                                <br />
                             </t>
                         </t>
                     </t>

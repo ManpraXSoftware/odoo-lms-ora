@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="email_template_peer_review_submitted" model="mail.template">
+            <field name="name">Peer Review Submitted</field>
+            <field name="model_id" ref="website_ora_elearning.model_open_response_rubric_staff"/>
+            <field name="subject">Peer Review Submitted for {{ ctx.get('slide_name') }}</field>
+            <field name="email_to">{{ ctx.get('peer_user_email') }}</field>
+            <field name="body_html">
+                <![CDATA[
+                    <p>Hello <span t-out="ctx.get('peer_user_name')"></span>,</p>
+                    <p>User <span t-out="ctx.get('user_name')"></span> has submitted an assessment.</p>
+                    <p>Kindly review it. The course slide is <strong t-out="ctx.get('slide_name')"></strong>.</p>
+                    <p>We appreciate your feedback.</p>
+                    <p>Thank you!</p>
+                ]]>
+            </field>
+        </record>
+    </data>
+</odoo>
+<!-- This XML file defines a mail template for notifying users when they submit a peer review in the Odoo LMS system. -->
+<!-- The template includes the recipient's email, subject line, and body content, which informs the user about their submission. -->

@@ -3,7 +3,7 @@
 
 from odoo import models, fields, api, tools
 from odoo.exceptions import UserError
-
+import re
 
 class Slide(models.Model):
     _inherit = 'slide.slide'
@@ -14,6 +14,21 @@ class Slide(models.Model):
     peer_limit = fields.Integer("Peer Limit")
     response_ids = fields.Many2many('ora.response', string="Responses", compute="_get_user_responses")
     response_count = fields.Integer("Responses", compute="_get_user_responses")
+    notify_peer = fields.Boolean(
+        string='Send Peer Notifications',
+        default=True,
+        help="Send email/internal notifications for peer reviewers."
+    )
+    notify_staff = fields.Boolean(
+        string='Send Staff Notifications',
+        default=True,
+        help="Send email/internal notifications to staff about peer assessment progress."
+    )
+    notify_user = fields.Boolean(
+        string='Send User Notifications',
+        default=True,
+        help="Send email/internal notifications to the submitting user."
+    )
 
     def _get_user_responses(self):
         for rec in self:
@@ -162,6 +177,11 @@ class ORAResponse(models.Model):
         ('inactive', 'Inactive'),
         ('assessed', 'Assessed')
     ], default="active", tracking=True)
+    peer_status = fields.Selection([
+        ('not_applicable', 'Not Applicable'),
+        ('started', 'Assessment Started'),
+        ('completed', 'Assessment Completed')
+    ], string='Peer Assessment Status', compute='_compute_peer_status', default='not_applicable', tracking=True)
 
     @api.depends('slide_rubric_staff_line.total_score')
     def calculate_total_xp(self):
@@ -172,19 +192,41 @@ class ORAResponse(models.Model):
                     total_xp += line.total_score
             rec.xp_points = total_xp
 
+    @api.depends('slide_rubric_staff_line.state')
+    def _compute_peer_status(self):
+        for record in self:
+            assessments = record.slide_rubric_staff_line.filtered(lambda r: r.assess_type == 'peer')
+            if not assessments:
+                record.peer_status = 'not_applicable'
+            elif all(a.state == 'completed' for a in assessments):
+                record.peer_status = 'completed'
+            else:
+                record.peer_status = 'started'
+                
     def action_mark_assessed(self):
-        if self.state == 'submitted':
-            only_peer = True
-            for line in self.slide_rubric_staff_line:
-                if line.assess_type == 'staff':
-                    self.state = 'assessed'
-                    line.state = 'completed'
-                    user_karma = self.user_id.karma
-                    user_karma += self.xp_points
-                    self.sudo().user_id.karma = user_karma
-                    only_peer = False
-            if only_peer:
-                raise UserError("Please fill the rubric first.")
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': 'Confirm Assessment',
+            'res_model': 'mark.assessed.wizard',
+            'view_mode': 'form',
+            'target': 'new',
+            'context': {
+                'default_response_id': self.id,
+            },
+        }
+        # if self.state == 'submitted':
+        #     only_peer = True
+        #     for line in self.slide_rubric_staff_line:
+        #         if line.assess_type == 'staff':
+        #             self.state = 'assessed'
+        #             line.state = 'completed'
+        #             user_karma = self.user_id.karma
+        #             user_karma += self.xp_points
+        #             self.sudo().user_id.karma = user_karma
+        #             only_peer = False
+        #     if only_peer:
+        #         raise UserError("Please fill the rubric first.")
 
 
 class OpenResponseUserLine(models.Model):
@@ -198,6 +240,21 @@ class OpenResponseUserLine(models.Model):
     question_name = fields.Html("Question", related='prompt_id.question_name', store=True, translate=tools.html_translate, sanitize_attributes=False, sanitize_form=False)
     question_sequence = fields.Integer('Sequence', related='prompt_id.sequence', store=True)
     response_type = fields.Selection(string="Response Type", related="prompt_id.response_type")
+    value_combined = fields.Text(
+        string="Answer",
+        compute="_compute_value_combined"
+    )
+    @api.depends('value_text_box', 'value_richtext_box')
+    def _compute_value_combined(self):
+        for rec in self:
+            if rec.value_text_box:
+                rec.value_combined = rec.value_text_box
+            elif rec.value_richtext_box:
+                # Strip HTML tags
+                plain_text = re.sub('<[^<]+?>', '', rec.value_richtext_box)
+                rec.value_combined = plain_text
+            else:
+                rec.value_combined = ''
 
 
 class OpenResponseRubricStaff(models.Model):

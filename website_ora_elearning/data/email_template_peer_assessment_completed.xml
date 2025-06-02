@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="mail_template_peer_assessment_completed" model="mail.template">
+            <field name="name">Peer Assessment Completed</field>
+            <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
+            <field name="subject">All Peer Assessments Completed</field>
+            <field name="email_from">${(user.email or 'noreply@yourdomain.com')}</field>
+            <field name="email_to">${object.staff_email}</field>
+            <field name="body_html"><![CDATA[
+                <p>Hello,</p>
+                <p>All peer assessments for the slide <strong>${object.slide_id.name}</strong> are now complete.</p>
+                <p>Regards,<br/>E-learning Team</p>
+            ]]></field>
+        </record>
+    </data>
+</odoo>

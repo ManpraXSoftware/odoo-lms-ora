@@ -39,15 +39,15 @@
                                                 </div>
                                             </t>
                                             <div class="row" style="line-height: 2.3em;">
-                                                <div class="d-flex align-items-start">
+                                                <div class="d-flex align-items-start" style="margin-top: 5px;">
                                                     <div t-attf-class="o_wforum_author_box d-inline-flex #{display_info and 'o_show_info'} #{compact and 'o_compact align-items-center'} #{bio_popover_data and 'o_wforum_bio_popover'}"
                                                     t-att-data-content="bio_popover_data">
                                                         <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                             <img t-attf-class="rounded-circle o_forum_avatar #{not display_info and 'shadow'}"
-                                                            t-att-src="website.image_url(response.user_id, 'image_1920', '40x40')" alt="Avatar"/>
+                                                            t-att-src="website.image_url(response.user_id, 'image_1920', '40x40')" alt="Avatar" style="margin-left:12px;" />
                                                         </div>
                                                     </div>
-                                                    <span class="ml-2">Your response has been submitted successfully on 
+                                                    <span class="ml-2" style="margin-left: 5px;">Your response has been submitted successfully on 
                                                         <t t-esc="response.submitted_date" t-options="{'widget': 'date','format': 'd MMM Y'}"/>
                                                     </span>
                                                 </div>
@@ -188,10 +188,10 @@
                                                     t-att-data-content="bio_popover_data">
                                                         <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                             <img t-attf-class="rounded-circle o_forum_avatar #{not display_info and 'shadow'}"
-                                                            t-att-src="website.image_url(response.user_id, 'image_1920', '40x40')" alt="Avatar"/>
+                                                            t-att-src="website.image_url(response.user_id, 'image_1920', '40x40')" style="margin-left:12px;" alt="Avatar"/>
                                                         </div>
                                                     </div>
-                                                    <span class="ml-2">Your response has been submitted successfully on 
+                                                    <span class="ml-2" style="margin-left: 5px;">Your response has been submitted successfully on 
                                                         <t t-esc="response.submitted_date" t-options="{'widget': 'date','format': 'd MMM Y'}"/>
                                                     </span>
                                                 </div>
@@ -317,7 +317,9 @@
                             </div>
                         </t>
                         <t t-if="not peer_responses">
-                            <h2>There is no peer responses to assess.</h2>
+                            <div style="min-height: 700px; display: flex; justify-content: center; align-items: center;">
+                                <h4 class="text-center">There is no peer responses to assess.</h4>
+                            </div>
                         </t>
                     </div>
             </div>
