@@ -19,6 +19,7 @@
         'data/email_template_peer_review_assignment.xml',
         'data/email_template_staff_review_assignment.xml',
         'data/email_template_peer_assessment_completed.xml',
+        'data/email_template_assessment_completed.xml',
     ],
     'assets': {
         'web.assets_frontend': [

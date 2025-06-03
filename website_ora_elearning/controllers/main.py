@@ -340,24 +340,26 @@ class WebsiteSlidesORA(WebsiteSlides):
             all_peer_completed = all(
                 l.state == 'completed' for l in response_id.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
             )
+            
             if all_peer_completed and slide.notify_staff:
+                peer_lines = response_id.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
+                peer_names = [line.user_id.name for line in peer_lines if line.user_id and line.state == 'completed']
+                peer_names_str = ", ".join(peer_names) if peer_names else "No peers found"
                 template = request.env.ref('website_ora_elearning.mail_template_peer_assessment_completed')
                 if template:
                     template.sudo().with_context(
                         user_response_id=response_id.id,
-                        user_name=request.env.user.name,
+                        user_name=response_id.user_id.name,
                         slide_name=slide.name,
-                    ).send_mail(request.env.user.id, force_send=True)
-                staff_lines = response_id.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'staff')
-                for staff_line in staff_lines:
-                    if staff_line.user_id and staff_line.user_id.partner_id:
-                        response_id.message_post(
-                            body=_('All peer assessments for "%s" are now completed.') % response_id.slide_id.name,
-                            message_type='notification',
-                            subtype_xmlid='mail.mt_comment',
-                            author_id=request.env.user.partner_id.id,
-                            partner_ids=[(4, staff_line.user_id.partner_id.id)]
-                        )
+                        peer_names=peer_names_str
+                    ).send_mail(response_id.id, force_send=True)
+                response_id.message_post(
+                    body=_('The response of %s has been submitted') % response_id.user_id.name,
+                    message_type='notification',
+                    subtype_xmlid='mail.mt_comment',
+                    author_id=request.env.user.partner_id.id,
+                    partner_ids=[response_id.staff_id.sudo().partner_id.id]
+                )
         return request.redirect('/slides/slide/%s' % request.env['ir.http']._slug(slide))
 
     def _get_channel_progress(self, channel, include_quiz=False):

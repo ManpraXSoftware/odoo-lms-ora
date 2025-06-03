@@ -78,7 +78,11 @@
             <field name="arch" type="xml">
                 <form string="ORA Response" create="false">
                     <header>
-                        <button name="action_mark_assessed" type="object" string="Mark Assessed" class="oe_highlight" invisible="state != 'submitted'"/>
+                        <button name="action_mark_assessed"
+                            type="object"
+                            string="Mark Assessed"
+                            class="oe_highlight"
+                            invisible="state != 'submitted' or not peer_status in ('not_applicable','completed')"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -196,7 +200,7 @@
                     <field name="user_id"/>
                     <field name="staff_id"/>
                     <field name="state"/>
-                    <button name="action_mark_assessed" type="object" string="Mark Assessed" class="oe_highlight" invisible="state != 'submitted'"/>
+                    <button name="action_mark_assessed" type="object" string="Mark Assessed" class="oe_highlight" invisible="state != 'submitted' or not peer_status in ('not_applicable','completed')"/>
                 </list>
             </field>
         </record>

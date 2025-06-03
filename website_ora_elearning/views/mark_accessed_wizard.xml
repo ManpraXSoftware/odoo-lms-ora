@@ -8,7 +8,7 @@
             <form string="Confirm Assessment">
                 <group string="Assessment Details">
                     <field name="response_id" invisible="1" />
-                    <field name="user_response_lines">
+                    <field name="user_response_lines" string="">
                         <list>
                             <field name="question_name"/>
                             <field name="value_combined"/>
@@ -17,8 +17,8 @@
                     </field>
                 </group>
 
-                <group string="Peer Assessments">
-                    <field name="peer_staff_lines">
+                <group string="Peer Assessments" invisible="not peer_staff_lines">
+                    <field name="peer_staff_lines" string="">
                         <list>
                             <field name="user_id"/>
                             <field name="submitted_date"/>
@@ -28,8 +28,8 @@
                     </field>
                 </group>
 
-                <group string="Rubric">
-                    <field name="option_ids">
+                <group string="Create Slide Rubric Staff Line">
+                    <field name="slide_rubric_staff_line" string="">
                         <list editable="bottom">
                             <field name="criteria_id"/>
                             <field name="criteria_desc"/>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+        <record id="email_template_assessment_completed" model="mail.template">
+            <field name="name">Assessment Completed</field>
+            <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
+            <field name="subject">Your Assessment is Completed</field>
+            <field name="email_from">{{ ctx.get('peer_user_email') }}</field>
+            <field name="email_to">{{ ctx.get('user_email') }}</field>
+            <field name="body_html"><![CDATA[
+                <p>Hello <t t-esc="ctx.get('user_email')",</p>
+                <p>All peer assessments for the slide <strong><t t-esc="ctx.get('slide_name')"/></strong> are now complete.</p>
+                <p>Thank you!</p>
+            ]]></field>
+        </record>
+    </data>
+</odoo>

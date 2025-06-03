@@ -13,7 +13,7 @@ class Slide(models.Model):
     peer_assessment = fields.Boolean("Peer Assessment")
     peer_limit = fields.Integer("Peer Limit")
     response_ids = fields.Many2many('ora.response', string="Responses", compute="_get_user_responses")
-    response_count = fields.Integer("Responses", compute="_get_user_responses")
+    response_count = fields.Integer("Responses Count", compute="_get_user_responses")
     notify_peer = fields.Boolean(
         string='Send Peer Notifications',
         default=True,
