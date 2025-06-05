@@ -125,6 +125,7 @@ class Slide(models.Model):
 class ORA_Prompt(models.Model):
     _name = 'open.response.prompt'
     _order = "sequence"
+    _description = 'Open Response Prompt'
 
     sequence = fields.Integer("Sequence")
     name = fields.Text("Description", translate=True)
@@ -139,6 +140,7 @@ class ORA_Prompt(models.Model):
 class ORA_Rubric(models.Model):
     _name = 'open.response.rubric'
     _rec_name = 'criterian_name'
+    _description = 'Open Response Rubric'
 
     name = fields.Text("Description", required=True, translate=True)
     slide_id = fields.Many2one('slide.slide')
@@ -148,6 +150,7 @@ class ORA_Rubric(models.Model):
 
 class RubricCriterian(models.Model):
     _name = 'rubric.criterian'
+    _description = 'Rubric Criterian'
 
     rubric_id = fields.Many2one('open.response.rubric')
     name = fields.Char("Option", required=True, translate=True)
@@ -215,22 +218,10 @@ class ORAResponse(models.Model):
                 'default_response_id': self.id,
             },
         }
-        # if self.state == 'submitted':
-        #     only_peer = True
-        #     for line in self.slide_rubric_staff_line:
-        #         if line.assess_type == 'staff':
-        #             self.state = 'assessed'
-        #             line.state = 'completed'
-        #             user_karma = self.user_id.karma
-        #             user_karma += self.xp_points
-        #             self.sudo().user_id.karma = user_karma
-        #             only_peer = False
-        #     if only_peer:
-        #         raise UserError("Please fill the rubric first.")
-
 
 class OpenResponseUserLine(models.Model):
     _name = 'open.response.user.line'
+    _description = 'Open Response User Line'
 
     response_id = fields.Many2one('ora.response', ondelete="cascade")
     value_text_box = fields.Text("Text answer", translate=True)
@@ -259,6 +250,7 @@ class OpenResponseUserLine(models.Model):
 
 class OpenResponseRubricStaff(models.Model):
     _name = 'open.response.rubric.staff'
+    _description = 'Open Response Rubric Staff'
 
     response_id = fields.Many2one('ora.response', ondelete="cascade")
     assess_type = fields.Selection([
@@ -285,6 +277,7 @@ class OpenResponseRubricStaff(models.Model):
 
 class OpenResponseRubricAssess(models.Model):
     _name = 'open.response.rubric.assess'
+    _description = 'Open Response Rubric Assessment'
 
     criteria_id = fields.Many2one('open.response.rubric', 'Criteria', required=True)
     criteria_desc = fields.Text(related='criteria_id.name')

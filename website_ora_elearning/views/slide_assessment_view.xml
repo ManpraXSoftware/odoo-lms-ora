@@ -58,13 +58,17 @@
                             </page>
                             <page name="settings" string="Settings">
                                 <group>
-                                    <field name="peer_assessment"/>
-                                    <field name="peer_limit"
-                                        required="peer_assessment == True"
-                                        invisible="peer_assessment == False"/>
-                                    <field name="notify_peer" />
-                                    <field name="notify_staff" />
-                                    <field name="notify_user" />
+                                    <group string="Peer Assessment">
+                                        <field name="peer_assessment"/>
+                                        <field name="peer_limit"
+                                            required="peer_assessment == True"
+                                            invisible="peer_assessment == False"/>
+                                    </group>
+                                    <group string="Notification Settings">
+                                        <field name="notify_peer" />
+                                        <field name="notify_staff" />
+                                        <field name="notify_user" />
+                                    </group>
                                 </group>
                             </page>
                         </notebook>

@@ -348,10 +348,10 @@
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-top: 15px;margin-left: 7px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
-                    <small class="text-muted">
-                        <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Question <t t-out="prompt['id']" />: </span>
-                    </small>
-                    <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                    <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        Question <t t-out="prompt['sequence'] + 1"/>:
+                    </span>
+                    <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                 </div>
             </div>
             <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id">
@@ -404,11 +404,10 @@
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-left: 60px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
-                    <small class="text-muted">
-                        <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Question <t t-out="prompt['id']" />: </span>
-                    </small>
-                    <br />
-                    <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                    <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        Question <t t-out="prompt['sequence'] + 1"/>:
+                    </span>
+                    <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                 </div>
             </div>
             <div class="row mb-2">
@@ -428,9 +427,6 @@
                                 <small class="text-muted">
                                     <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
-                                <!-- <small class="text-muted">
-                                    <i class="fa fa-font me-1"></i>
-                                </small> -->
                                 <span class="ml-1" style="line-height: 1">
                                     <span t-out="user_input.value_richtext_box"/>
                                 </span>

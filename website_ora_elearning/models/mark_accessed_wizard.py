@@ -5,6 +5,7 @@ from odoo.exceptions import UserError
 class MarkAssessedWizard(models.TransientModel):
     _name = 'mark.assessed.wizard'
     _description = 'Wizard to confirm assessment'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     response_id = fields.Many2one('ora.response', ondelete="cascade")
 
@@ -82,21 +83,46 @@ class MarkAssessedWizard(models.TransientModel):
         if not staff_assess:
             raise UserError('Staff could not be able to assess the assessment')
         else:
-            template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
-            if template:
-                template.sudo().with_context(
-                    slide_name=slide.name,
-                    user_email = self.env.user.email,
-                    user_name = self.env.user.name,
-                ).send_mail(ora_response.id, force_send=True)
+            if slide.notify_user:
+                template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
+                if template:
+                    template.sudo().with_context(
+                        slide_name=slide.name,
+                        user_email = self.env.user.email,
+                        user_name = self.env.user.name,
+                        staff_name = ora_response.staff_id.sudo().partner_id.name
+                    ).send_mail(ora_response.id, force_send=True)
 
-            # Step 5: Post internal notification to user
-            ora_response.message_post(
-                body="✅ Your assessment has been assessed.",
-                partner_ids=[slide.user_id.partner_id.id],
-                message_type='notification',
-                subtype_xmlid='mail.mt_note',
-            )
+                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+                action = self.env.ref('website_ora_elearning.action_ora_response')
+                url = f"{base_url}/odoo/action-{action.id}/{ora_response.id}"
+                msg = self.env['mail.message'].create({
+                    'model': 'res.partner',  # or 'ora.response', 'discuss.channel', etc.
+                    'res_id': slide.user_id.partner_id.id,  # record to attach to
+                    'message_type': 'comment',
+                    'subtype_id': self.env.ref('mail.mt_comment').id,
+                    'author_id': self.env.user.partner_id.id,
+                    'body': f"""
+                        <p>Your assessment for the ORA content <strong>{slide.name}</strong> has been reviewed and evaluated by staff member <strong>{ora_response.staff_id.sudo().partner_id.name}</strong>.</p>
+                        <div style="padding: 16px 8px; text-align: center;">
+                            <a href="{url}"
+                            style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                                View ORA Response
+                            </a>
+                        </div>
+                        <p>We hope you enjoy this feedback and continue learning with us!</p>
+                        <br/>
+                        <p>Best regards,<br/>
+                        {ora_response.user_id.partner_id.name or ''}</p>
+                    """,
+                })
+                self.env['mail.notification'].create({
+                    'author_id': msg.author_id.id,
+                    'mail_message_id': msg.id,
+                    'res_partner_id': slide.user_id.partner_id.id,  # the recipient
+                    'notification_type': 'inbox',  # 'inbox' shows in top-right (Discuss)
+                    'notification_status': 'sent',
+                })
 
 
 class MarkAssessedWizardLine(models.TransientModel):

@@ -71,14 +71,37 @@ class WebsiteSlidesORA(WebsiteSlides):
 
     def _notify_peer_users(self, slide, user_response, peer_users):
         for peer in peer_users:
-            user_response.message_post(
-                body=_('You have been assigned to assess the response of %s') % user_response.user_id.name,
-                message_type='notification',
-                subtype_xmlid='mail.mt_comment',
-                author_id=request.env.user.partner_id.id,
-                partner_ids=[peer.partner_id.id]
-            )
-
+            base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            action = request.env.ref('website_ora_elearning.action_ora_response')
+            url = f"{base_url}/odoo/action-{action.id}/{user_response.id}"
+            msg = request.env['mail.message'].create({
+                'model': 'res.partner',
+                'res_id': peer.partner_id.id,
+                'message_type': 'comment',
+                'subtype_id': request.env.ref('mail.mt_comment').id,
+                'author_id': request.env.user.partner_id.id,
+                'body': f"""
+                    <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                    <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
+                    <div style="padding: 16px 8px; text-align: center;">
+                        <a href="{url}"
+                        style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                            View ORA Response
+                        </a>
+                    </div>
+                    <p>Thank you for your valuable time and feedback.</p>
+                    <br/>
+                    <p>Best regards,<br/>
+                    {user_response.user_id.partner_id.name or ''}</p>
+                    """,
+            })
+            request.env['mail.notification'].create({
+                'author_id': msg.author_id.id,
+                'mail_message_id': msg.id,
+                'res_partner_id': peer.partner_id.id,
+                'notification_type': 'inbox',
+                'notification_status': 'sent',
+            })
             template = request.env.ref('website_ora_elearning.email_template_peer_review_submitted')
             if template:
                 template.sudo().with_context(
@@ -95,14 +118,37 @@ class WebsiteSlidesORA(WebsiteSlides):
         if not staff:
             raise UserError(_('No peer users and staff are available for assessment. Please try again later.'))
 
-        user_response.message_post(
-            body=_('The response of %s has been submitted') % user_response.user_id.name,
-            message_type='notification',
-            subtype_xmlid='mail.mt_comment',
-            author_id=request.env.user.partner_id.id,
-            partner_ids=[staff.partner_id.id]
-        )
-
+        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        action = request.env.ref('website_ora_elearning.action_ora_response')
+        url = f"{base_url}/odoo/action-{action.id}/{user_response.id}"
+        msg = request.env['mail.message'].create({
+            'model': 'res.partner',
+            'res_id': slide.user_id.partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': request.env.ref('mail.mt_comment').id,
+            'author_id': request.env.user.partner_id.id,
+            'body': f"""
+                <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
+                <div style="padding: 16px 8px; text-align: center;">
+                    <a href="{url}"
+                    style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                        View ORA Response
+                    </a>
+                </div>
+                <p>Thank you for your valuable time and feedback.</p>
+                <br/>
+                <p>Best regards,<br/>
+                {user_response.user_id.partner_id.name or ''}</p>
+                """,
+        })
+        request.env['mail.notification'].create({
+            'author_id': msg.author_id.id,
+            'mail_message_id': msg.id,
+            'res_partner_id': slide.user_id.partner_id.id,
+            'notification_type': 'inbox',
+            'notification_status': 'sent',
+        })
         template = request.env.ref('website_ora_elearning.email_template_staff_review_submitted')
         if template:
             template.sudo().with_context(
@@ -134,8 +180,6 @@ class WebsiteSlidesORA(WebsiteSlides):
                             line.value_text_box = oline.value_text_box
                         elif line.response_type == 'rich_text':
                             line.value_richtext_box = Markup(oline.value_richtext_box)
-                            # query = ("update open_response_user_line set value_richtext_box='%s' where id=%s") % (oline.value_richtext_box, oline.id)
-                            # request.cr.execute(query)
         else:
             for line in response.user_response_line:
                 if line.response_type == 'text':
@@ -172,9 +216,6 @@ class WebsiteSlidesORA(WebsiteSlides):
             values['total_responses'] = total_responses
             values['assessed_response'] = assessed_response
             values['rubric_ids'] = slide.rubric_ids
-            # if assessed_response:
-            #     values['channel_progress'][slide.id]['quiz_karma_gain'] += assessed_response.xp_points
-            #     values['channel_progress'][slide.id]['quiz_karma_won'] += assessed_response.xp_points
             for response in total_responses:
                 if response.feedback == '<p><br></p>':
                     response.feedback = False
@@ -315,52 +356,96 @@ class WebsiteSlidesORA(WebsiteSlides):
     @http.route('/submit/peer/response', type='http', auth="user", website=True)
     def submit_peer_response(self, **kwargs):
         slide = request.env['slide.slide'].sudo().browse(int(kwargs.get('slide_id')))
-        if kwargs.get('response_id'):
-            response_id = request.env['ora.response'].browse(int(kwargs.get('response_id')))
-            for line in response_id.slide_rubric_staff_line:
-                if line.user_id == request.env.user and line.assess_type == 'peer':
-                    values = []
-                    for criteria in response_id.slide_id.rubric_ids:
-                        opt_key = ''
-                        exp_key = ''
-                        for option_id in criteria.criterian_ids:
-                            opt_key = 'options_%s_%s' % (response_id.id, criteria.id)
-                            exp_key = 'exp_%s_%s' % (response_id.id, criteria.id)
-                            if opt_key in kwargs and exp_key in kwargs:
-                                break
-                        option_id = kwargs.get(opt_key)
-                        values.append((0, 0, {
-                            'criteria_id': criteria.id,
-                            'option_id': int(option_id) if option_id else False,
-                            'assess_explanation': kwargs.get(exp_key)
-                        }))
-                    line.option_ids = values
-                    line.state = 'completed'
-                    line.submitted_date = datetime.now()
-            all_peer_completed = all(
-                l.state == 'completed' for l in response_id.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
-            )
-            
-            if all_peer_completed and slide.notify_staff:
-                peer_lines = response_id.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
-                peer_names = [line.user_id.name for line in peer_lines if line.user_id and line.state == 'completed']
-                peer_names_str = ", ".join(peer_names) if peer_names else "No peers found"
-                template = request.env.ref('website_ora_elearning.mail_template_peer_assessment_completed')
-                if template:
-                    template.sudo().with_context(
-                        user_response_id=response_id.id,
-                        user_name=response_id.user_id.name,
-                        slide_name=slide.name,
-                        peer_names=peer_names_str
-                    ).send_mail(response_id.id, force_send=True)
-                response_id.message_post(
-                    body=_('The response of %s has been submitted') % response_id.user_id.name,
-                    message_type='notification',
-                    subtype_xmlid='mail.mt_comment',
-                    author_id=request.env.user.partner_id.id,
-                    partner_ids=[response_id.staff_id.sudo().partner_id.id]
-                )
+        response_id = int(kwargs.get('response_id'))
+        response = request.env['ora.response'].browse(response_id)
+
+        self._submit_peer_review(response, request.env.user, kwargs)
+
+        if self._all_peers_completed(response) and slide.notify_staff:
+            self._notify_staff_on_peer_completion(response, slide)
+
         return request.redirect('/slides/slide/%s' % request.env['ir.http']._slug(slide))
+
+    def _submit_peer_review(self, response, user, kwargs):
+        for line in response.slide_rubric_staff_line:
+            if line.user_id == user and line.assess_type == 'peer':
+                values = []
+                for criteria in response.slide_id.rubric_ids:
+                    opt_key = f'options_{response.id}_{criteria.id}'
+                    exp_key = f'exp_{response.id}_{criteria.id}'
+                    option_id = kwargs.get(opt_key)
+                    values.append((0, 0, {
+                        'criteria_id': criteria.id,
+                        'option_id': int(option_id) if option_id else False,
+                        'assess_explanation': kwargs.get(exp_key)
+                    }))
+                line.option_ids = values
+                line.state = 'completed'
+                line.submitted_date = datetime.now()
+
+    def _all_peers_completed(self, response):
+        peer_lines = response.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
+        return all(l.state == 'completed' for l in peer_lines)
+
+    def _notify_staff_on_peer_completion(self, response, slide):
+        peer_lines = response.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer' and l.state == 'completed')
+        peer_names = [l.user_id.name for l in peer_lines]
+        peer_emails = [l.user_id.email for l in peer_lines]
+
+        peer_email_str = ", ".join(peer_emails) if peer_emails else "No peers found"
+
+        template = request.env.ref('website_ora_elearning.mail_template_peer_assessment_completed')
+        if template:
+            template.sudo().with_context(
+                user_response_id=response.id,
+                user_email=response.user_id.email,
+                slide_name=slide.name,
+                peer_emails=peer_email_str
+            ).send_mail(response.id, force_send=True)
+
+        peer_name_str = self._format_peer_names(peer_names)
+        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        action = request.env.ref('website_ora_elearning.action_ora_response')
+        url = f"{base_url}/odoo/action-{action.id}/{response.id}"
+
+        msg = request.env['mail.message'].create({
+            'model': 'res.partner',
+            'res_id': response.user_id.sudo().partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': request.env.ref('mail.mt_comment').id,
+            'author_id': request.env.user.partner_id.id,
+            'body': f"""
+                <p>Dear {response.user_id.name},</p>
+                <p><strong>{peer_name_str}</strong> {('has' if len(peer_names) == 1 else 'have')} submitted their peer assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                <p>We kindly request you to review and evaluate the submission at your earliest convenience.</p>
+                <div style="padding: 16px 8px; text-align: center;">
+                    <a href="{url}" style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                        View ORA Response
+                    </a>
+                </div>
+                <p>Your feedback is highly valued and contributes significantly to the learner's development.</p>
+                <br/>
+                <p>Best regards,<br/>{peer_name_str}</p>
+            """,
+        })
+
+        request.env['mail.notification'].create({
+            'author_id': msg.author_id.id,
+            'mail_message_id': msg.id,
+            'res_partner_id': response.user_id.sudo().partner_id.id,
+            'notification_type': 'inbox',
+            'notification_status': 'sent',
+        })
+
+    def _format_peer_names(self, names):
+        if not names:
+            return "No peers found"
+        if len(names) == 1:
+            return names[0]
+        elif len(names) == 2:
+            return f"{names[0]} and {names[1]}"
+        else:
+            return f"{', '.join(names[:-1])}, and {names[-1]}"
 
     def _get_channel_progress(self, channel, include_quiz=False):
         result = super(WebsiteSlidesORA, self)._get_channel_progress(channel, include_quiz=include_quiz)

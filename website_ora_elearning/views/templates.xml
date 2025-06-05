@@ -405,10 +405,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start">
-                        <small class="text-muted">
-                            <i class="fa fa-quora me-2"></i>
-                        </small>
-                        <span class="question_text ml-1" style="line-height:1;" t-out="prompt['question']"/>
+                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                            Question <t t-out="prompt['sequence'] + 1"/>:
+                        </span>
+                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group">
@@ -438,10 +438,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <small class="text-muted">
-                            <i class="fa fa-quora me-2"></i>
-                        </small>
-                        <span class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                            Question <t t-out="prompt['sequence'] + 1"/>:
+                        </span>
+                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group">
@@ -475,10 +475,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <small class="text-muted">
-                            <i class="fa fa-quora me-2"></i>
-                        </small>
-                        <span class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                            Question <t t-out="prompt['sequence'] + 1"/>:
+                        </span>
+                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group flex-row">
@@ -486,7 +486,7 @@
                         <t t-if="user_input.prompt_id.id == prompt['id']">
                             <t t-if="prompt['response_type'] == 'text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="input-group ml-1" style="line-height:1">
                                     <t t-esc="user_input.value_text_box"/>
@@ -494,7 +494,7 @@
                             </t>
                             <t t-if="prompt['response_type'] == 'rich_text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="ml-1" style="line-height:1">
                                     <span t-field="user_input.value_richtext_box"/>
@@ -511,10 +511,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <small class="text-muted">
-                            <i class="fa fa-quora me-2"></i>
-                        </small>
-                        <span class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                            Question <t t-out="prompt['sequence'] + 1"/>:
+                        </span>
+                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group flex-row">
@@ -522,7 +522,7 @@
                         <t t-if="user_input.prompt_id.id == prompt['id']">
                             <t t-if="prompt['response_type'] == 'text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="input-group ml-1" style="line-height:1">
                                     <t t-esc="user_input.value_text_box"/>
@@ -530,7 +530,7 @@
                             </t>
                             <t t-if="prompt['response_type'] == 'rich_text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="ml-1" style="line-height:1">
                                     <span t-field="user_input.value_richtext_box"/>
@@ -547,10 +547,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <small class="text-muted">
-                            <i class="fa fa-quora me-2"></i>
-                        </small>
-                        <span class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-raw="prompt['question']"/>
+                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                            Question <t t-out="prompt['sequence'] + 1"/>:
+                        </span>
+                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group flex-row">
@@ -558,7 +558,7 @@
                         <t t-if="user_input.prompt_id.id == prompt['id']">
                             <t t-if="prompt['response_type'] == 'text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="input-group ml-1" style="line-height:1">
                                     <t t-esc="user_input.value_text_box"/>
@@ -566,7 +566,7 @@
                             </t>
                             <t t-if="prompt['response_type'] == 'rich_text'">
                                 <small class="text-muted">
-                                    <i class="fa fa-font me-2"></i>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
                                 </small>
                                 <div class="ml-1" style="line-height:1">
                                     <span t-field="user_input.value_richtext_box"/>
@@ -642,7 +642,7 @@
                     </t>
                     <t t-foreach="response.slide_rubric_staff_line" t-as="staff_line">
                         <t t-if="staff_line.user_id == user and staff_line.state == 'in_progress'">
-                            <h3>Complete the rubric and submit the assessment.</h3>
+                            <h4>Complete the rubric and submit the assessment.</h4>
                             <div>
                                 <t t-foreach="rubric_ids" t-as="rubric">
                                     <ul class="list-group">

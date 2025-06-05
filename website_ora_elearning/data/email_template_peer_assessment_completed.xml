@@ -5,13 +5,22 @@
             <field name="name">Peer Assessment Completed</field>
             <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
             <field name="subject">All Peer Assessments Completed</field>
-            <field name="email_from">{{ ctx.get('peer_names') }}</field>
-            <field name="email_to">{{ ctx.get('user_name') }}</field>
+            <field name="email_from">{{ ctx.get('peer_emails') }}</field>
+            <field name="email_to">{{ ctx.get('user_email') }}</field>
             <field name="body_html"><![CDATA[
-                <p>Hello,</p>
-                <p>All peer assessments for the slide <strong>${object.slide_id.name}</strong> are now complete.</p>
-                <p>Thank you!</p>
-                <p>Regards,<br/>E-learning Team</p>
+                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
+                    <p>Hello,</p>
+                    <p>
+                        All peer assessments for the slide titled 
+                        <strong><t t-esc="ctx.get('slide_name')"/></strong> have now been completed.
+                    </p>
+                    <p>
+                        We kindly invite you to review the learner’s submission at your earliest convenience.
+                    </p>
+                    <p>Thank you!</p>
+                    <p>Best regards,<br/>
+                    <t t-esc="ctx.get('peer_name_str')"/></p>
+                </div>
             ]]></field>
         </record>
     </data>
