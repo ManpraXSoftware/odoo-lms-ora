@@ -8,8 +8,8 @@
             <field name="email_from">{{ ctx.get('peer_user_email') }}</field>
             <field name="email_to">{{ ctx.get('user_email') }}</field>
             <field name="body_html"><![CDATA[
-                <p>Hello {{ ctx.get('user_name') }},</p>
-                <p>Your assessment for the ORA content titled <strong>{{ ctx.get('slide_name') }}</strong> has been reviewed and evaluated by <strong>{{ ctx.get('staff_name', 'a staff member') }}</strong>.</p>
+                <p>Hello <span t-out="ctx.get('user_name')"></span>,</p>
+                <p>Your assessment for the ORA content titled <strong><span t-out="ctx.get('slide_name')"></span></strong> has been reviewed and evaluated by <strong><span t-out="ctx.get('staff_name')"></span></strong>.</p>
                 <p>Kindly check the feedback at your convenience.</p>
                 <p>Thank you!</p>
             ]]></field>

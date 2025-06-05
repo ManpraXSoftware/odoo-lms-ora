@@ -548,7 +548,7 @@
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
                         <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
-                            Question <t t-out="prompt['sequence'] + 1"/>:
+                            Question <t t-out="prompt.get('sequence', 0) + 1"/>:
                         </span>
                         <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
