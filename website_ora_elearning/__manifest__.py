@@ -13,13 +13,11 @@
         'data/ir_cron_data.xml',
         'security/ir.model.access.csv',
         'views/slide_assessment_view.xml',
+        'views/slide_channel_form_view.xml',
         'views/templates.xml',
         'views/slide_fullscreen_view.xml',
         'views/mark_accessed_wizard.xml',
-        'data/email_template_peer_review_assignment.xml',
-        'data/email_template_staff_review_assignment.xml',
-        'data/email_template_peer_assessment_completed.xml',
-        'data/email_template_assessment_completed.xml',
+        'data/email_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [

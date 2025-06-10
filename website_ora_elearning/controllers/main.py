@@ -50,15 +50,19 @@ class WebsiteSlidesORA(WebsiteSlides):
         return request.redirect('/slides/slide/%s' % request.env['ir.http']._slug(slide))
 
     def _assign_peer_review_users(self, slide, user_response):
+        # create a course with admin
+        # create two portal user and then fill course from them and check which is coming in peer user
+        # it should not be from author of user
+        author_partner = slide.channel_id.user_id.partner_id
         enrolled_users = slide.channel_id.partner_ids.filtered(
-            lambda p: p.id != request.env.user.partner_id.id
+            lambda p: p.id != request.env.user.partner_id.id and p.id != author_partner.id
         )
         peer_limit = min(slide.peer_limit, len(enrolled_users))
         peer_users = []
 
         for _ in range(peer_limit):
             peer_user = slide._get_peer_user(user_response)
-            if peer_user:
+            if peer_user and peer_user.id != author_partner.id and peer_user not in peer_users:
                 peer_users.append(peer_user)
                 request.env['open.response.rubric.staff'].create({
                     'assess_type': 'peer',
@@ -71,9 +75,6 @@ class WebsiteSlidesORA(WebsiteSlides):
 
     def _notify_peer_users(self, slide, user_response, peer_users):
         for peer in peer_users:
-            base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-            action = request.env.ref('website_ora_elearning.action_ora_response')
-            url = f"{base_url}/odoo/action-{action.id}/{user_response.id}"
             msg = request.env['mail.message'].create({
                 'model': 'res.partner',
                 'res_id': peer.partner_id.id,
@@ -84,7 +85,7 @@ class WebsiteSlidesORA(WebsiteSlides):
                     <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
                     <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
                     <div style="padding: 16px 8px; text-align: center;">
-                        <a href="{url}"
+                        <a href="{slide.website_url}?fullscreen=1#"
                         style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
                             View ORA Response
                         </a>
@@ -111,6 +112,7 @@ class WebsiteSlidesORA(WebsiteSlides):
                     user_id=request.env.user.id,
                     user_name=request.env.user.name,
                     slide_name=slide.name,
+                    slide_url=slide.website_url + '?fullscreen=1#'
                 ).send_mail(peer.id, force_send=True)
 
     def _notify_staff(self, slide, user_response):
@@ -118,9 +120,6 @@ class WebsiteSlidesORA(WebsiteSlides):
         if not staff:
             raise UserError(_('No peer users and staff are available for assessment. Please try again later.'))
 
-        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        action = request.env.ref('website_ora_elearning.action_ora_response')
-        url = f"{base_url}/odoo/action-{action.id}/{user_response.id}"
         msg = request.env['mail.message'].create({
             'model': 'res.partner',
             'res_id': slide.user_id.partner_id.id,
@@ -131,7 +130,7 @@ class WebsiteSlidesORA(WebsiteSlides):
                 <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
                 <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
                 <div style="padding: 16px 8px; text-align: center;">
-                    <a href="{url}"
+                    <a href="{slide.website_url}?fullscreen=1#"
                     style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
                         View ORA Response
                     </a>
@@ -158,6 +157,7 @@ class WebsiteSlidesORA(WebsiteSlides):
                 user_id=request.env.user.id,
                 user_name=request.env.user.name,
                 slide_name=slide.name,
+                slide_url=slide.website_url + '?fullscreen=1#'
             ).send_mail(staff.id, force_send=True)
 
     def _get_access_data(self, post, resubmit=False):
@@ -393,20 +393,21 @@ class WebsiteSlidesORA(WebsiteSlides):
         peer_emails = [l.user_id.email for l in peer_lines]
 
         peer_email_str = ", ".join(peer_emails) if peer_emails else "No peers found"
+        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        action = request.env.ref('website_ora_elearning.action_ora_response')
+        url = f"{base_url}/odoo/action-{action.id}/{response.id}"
 
         template = request.env.ref('website_ora_elearning.mail_template_peer_assessment_completed')
         if template:
             template.sudo().with_context(
                 user_response_id=response.id,
-                user_email=response.user_id.email,
+                user_email=response.staff_id.email,
                 slide_name=slide.name,
-                peer_emails=peer_email_str
+                peer_emails=peer_email_str,
+                url=url
             ).send_mail(response.id, force_send=True)
 
         peer_name_str = self._format_peer_names(peer_names)
-        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        action = request.env.ref('website_ora_elearning.action_ora_response')
-        url = f"{base_url}/odoo/action-{action.id}/{response.id}"
 
         msg = request.env['mail.message'].create({
             'model': 'res.partner',

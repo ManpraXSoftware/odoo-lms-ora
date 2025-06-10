@@ -317,7 +317,7 @@
                             </div>
                         </t>
                         <t t-if="not peer_responses">
-                            <div style="min-height: 700px; display: flex; justify-content: center; align-items: center;">
+                            <div style="height: 40vh; display: flex; justify-content: center; align-items: center; overflow: hidden;">
                                 <h4 class="text-center">There is no peer responses to assess.</h4>
                             </div>
                         </t>
@@ -473,35 +473,30 @@
         <template id="lesson_content_quiz_prompt_submitted">
             <div t-att-class="'o_wslides_js_lesson_quiz_question mt-3 %s' % ('disabled' if not (slide.channel_id.is_member) else '')"
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
-                <div class="row d-flex mb-2">
-                    <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                <div class="row mb-2">
+                    <div class="col-12 d-flex">
+                        <div style="font-size: 15px; font-weight: 500; color: black; margin-right: 8px;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
-                        </span>
-                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                        </div>
+                        <div style="font-size: 15px; color: black;" t-out="prompt['question']"/>
                     </div>
                 </div>
-                <div class="list-group flex-row">
-                    <t t-foreach="response.user_response_line" t-as="user_input">
-                        <t t-if="user_input.prompt_id.id == prompt['id']">
-                            <t t-if="prompt['response_type'] == 'text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
-                                </small>
-                                <div class="input-group ml-1" style="line-height:1">
-                                    <t t-esc="user_input.value_text_box"/>
-                                </div>
+                <div class="row mb-2">
+                    <div class="col-12 d-flex">
+                        <div style="font-size: 15px; font-weight: 500; color: black; margin-right: 8px;">Answer:</div>
+                        <div style="font-size: 15px; color: black;">
+                            <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_input">
+                                <t t-if="user_input.prompt_id.id == prompt['id']">
+                                    <t t-if="prompt['response_type'] == 'text'">
+                                        <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
+                                    </t>
+                                    <t t-if="prompt['response_type'] == 'rich_text'">
+                                        <span t-out="user_input.value_richtext_box"/>
+                                    </t>
+                                </t>
                             </t>
-                            <t t-if="prompt['response_type'] == 'rich_text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
-                                </small>
-                                <div class="ml-1" style="line-height:1">
-                                    <span t-field="user_input.value_richtext_box"/>
-                                </div>
-                            </t>
-                        </t>
-                    </t>
+                        </div>
+                    </div>
                 </div>
                 <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
             </div>
@@ -522,7 +517,7 @@
                         <t t-if="user_input.prompt_id.id == prompt['id']">
                             <t t-if="prompt['response_type'] == 'text'">
                                 <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer: </span>
                                 </small>
                                 <div class="input-group ml-1" style="line-height:1">
                                     <t t-esc="user_input.value_text_box"/>
@@ -530,7 +525,7 @@
                             </t>
                             <t t-if="prompt['response_type'] == 'rich_text'">
                                 <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
+                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer: </span>
                                 </small>
                                 <div class="ml-1" style="line-height:1">
                                     <span t-field="user_input.value_richtext_box"/>
@@ -545,35 +540,35 @@
         <template id="lesson_content_quiz_prompt_assessed" name="Lesson: ORA prompt template">
             <div t-att-class="'o_wslides_js_lesson_quiz_question mt-3 %s' % ('disabled' if not (slide.channel_id.is_member) else '')"
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
-                <div class="row d-flex mb-2">
+                <div class="row mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
                             Question <t t-out="prompt.get('sequence', 0) + 1"/>:
                         </span>
                         <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
-                <div class="list-group flex-row">
-                    <t t-foreach="response.user_response_line" t-as="user_input">
-                        <t t-if="user_input.prompt_id.id == prompt['id']">
-                            <t t-if="prompt['response_type'] == 'text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
-                                </small>
-                                <div class="input-group ml-1" style="line-height:1">
-                                    <t t-esc="user_input.value_text_box"/>
-                                </div>
-                            </t>
-                            <t t-if="prompt['response_type'] == 'rich_text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer : </span>
-                                </small>
-                                <div class="ml-1" style="line-height:1">
-                                    <span t-field="user_input.value_richtext_box"/>
-                                </div>
+                <div class="row mb-2">
+                    <div style="display:inline-flex;line-height:1">
+                        <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
+                            <t t-if="user_input.prompt_id.id == prompt['id']">
+                                <t t-if="prompt['response_type'] == 'text'">
+                                    <small class="text-muted">
+                                        <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right:8px;">Answer: </span>
+                                    </small>
+                                    <span class="ml-1" style="line-height: 1; font-size: 15px; color: black;">
+                                        <t t-if="prompt['response_type'] == 'text'">
+                                            <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
+                                        </t>
+                                        <t t-if="prompt['response_type'] == 'rich_text'">
+                                            <span t-out="user_input.value_richtext_box"/>
+                                        </t>
+                                    </span>
+                                    <br/>
+                                </t>
                             </t>
                         </t>
-                    </t>
+                    </div>
                 </div>
                 <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
             </div>

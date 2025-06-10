@@ -99,10 +99,13 @@ class Slide(models.Model):
         :param response: Current response on which we are checking the peers.
         :return: A res.users record or None.
         '''
-        enrolled_users = list(set(self.channel_id.partner_ids.ids) - set(ora_response.user_id.partner_id.ids))
+        current_partner_id = ora_response.user_id.partner_id.id
+        author_partner_id = self.channel_id.user_id.partner_id.id
+        enrolled_partner_ids = self.channel_id.partner_ids.ids
+        eligible_partner_ids = list(set(enrolled_partner_ids) - {current_partner_id, author_partner_id})
         peer_limit = self.peer_limit
         to_allocate_user = {}
-        for partner_id in enrolled_users:
+        for partner_id in eligible_partner_ids:
             rubric_line_ids = self.env['open.response.rubric.staff'].search([
                 ('assess_type', '=', 'peer'),
                 ('user_id.partner_id', '=', partner_id),
@@ -121,6 +124,29 @@ class Slide(models.Model):
         if user_ids:
             return self.env['res.users'].search([('partner_id', '=', user_ids[0])], limit=1)
 
+class Channel(models.Model):
+    _inherit = 'slide.channel'
+    
+    response_count = fields.Integer("Responses Count", compute="_get_user_responses")
+    response_ids = fields.Many2many('ora.response', string="Responses", compute="_get_user_responses")
+    prompt_ids = fields.One2many('open.response.prompt', 'channel_id')
+
+    def _get_user_responses(self):
+        for rec in self:
+            rec.response_ids = [(5, 0, 0)]  # clear m2m
+            rec.response_count = 0
+            all_prompt_ids = rec.slide_ids.mapped('prompt_ids').ids
+            if all_prompt_ids:
+                user_response_ids = self.env['ora.response'].search([
+                    ('user_response_line.prompt_id', 'in', all_prompt_ids)
+                ])
+                rec.response_ids = [(6, 0, user_response_ids.ids)]
+                rec.response_count = len(user_response_ids)
+                    
+    def action_open_responses(self):
+        action = self.env['ir.actions.act_window']._for_xml_id('website_ora_elearning.action_ora_response')
+        action['domain'] = [('id', 'in', self.response_ids.ids)]
+        return action
 
 class ORA_Prompt(models.Model):
     _name = 'open.response.prompt'
@@ -130,6 +156,7 @@ class ORA_Prompt(models.Model):
     sequence = fields.Integer("Sequence")
     name = fields.Text("Description", translate=True)
     slide_id = fields.Many2one('slide.slide')
+    channel_id = fields.Many2one('slide.channel')
     question_name = fields.Html("Question", required=True, translate=True)
     response_type = fields.Selection([
         ('text', 'Text'),
@@ -165,6 +192,12 @@ class ORAResponse(models.Model):
     _description = "Response"
 
     slide_id = fields.Many2one('slide.slide', "Content")
+    channel_id = fields.Many2one(
+        related="slide_id.channel_id",
+        string="Course",
+        store=True,
+        readonly=False  # Optional: allow override if needed
+    )
     user_id = fields.Many2one('res.users', "User")
     staff_id = fields.Many2one(related="slide_id.channel_id.user_id", string="Staff", store=True)
     feedback = fields.Html("Feedback", translate=True, sanitize_attributes=False, sanitize_form=False)
@@ -286,7 +319,17 @@ class OpenResponseRubricAssess(models.Model):
     criteria_option_point = fields.Integer(related='option_id.option_points')
     assess_explanation = fields.Text("Assess Explanation", required=True, translate=True)
     response_assess_id = fields.Many2one('open.response.rubric.staff', ondelete="cascade")
+    slide_id = fields.Many2one('slide.slide', compute='_compute_slide_id', store=False)
 
+    @api.depends('response_assess_id')
+    def _compute_slide_id(self):
+        for rec in self:
+            rec.slide_id = (
+                rec.response_assess_id.response_id.slide_id
+                if rec.response_assess_id and rec.response_assess_id.response_id
+                else False
+            )
+            
     @api.onchange('criteria_id')
     def onchange_criteria_id(self):
         for rec in self:

@@ -93,6 +93,7 @@
                         <group col="2">
                             <group>
                                 <field name="slide_id" readonly="1"/>
+                                <field name="channel_id" readonly="1"/>
                                 <field name="create_date" readonly="1"/>
                                 <field name="user_id" readonly="1"/>
                                 <field name="submitted_date" readonly="0"/>
@@ -170,7 +171,7 @@
                                         <separator string="Options"/>
                                         <field name="option_ids">
                                             <list editable="bottom">
-                                                <field name="criteria_id"/>
+                                                <field name="criteria_id" domain="[('slide_id', '=', slide_id)]"/>
                                                 <field name="criteria_desc"/>
                                                 <field name="option_id" domain="[('rubric_id', '=', criteria_id)]"/>
                                                 <field name="criteria_option_desc"/>
