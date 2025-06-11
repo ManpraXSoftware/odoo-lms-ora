@@ -40,7 +40,12 @@
                                             <strong><field name="user_id"/></strong>
                                             <div>Submitted: <field name="submitted_date"/></div>
                                             <div>State: <field name="state"/></div>
-                                            <div>Score: <field name="total_score"/></div>
+                                            <!-- <div>Score: <field name="total_score"/> Points</div> -->
+                                            <div>
+                                                Score: <field name="total_score"/>
+                                                <t t-if="record.total_score == 1 or record.total_score == 0"> Point</t>
+                                                <t t-else=""> Points</t>
+                                            </div>
                                         </div>
                                     </div>
                                 </t>
@@ -52,10 +57,10 @@
                 <group string="Create Slide Rubric Staff Line">
                     <div class="oe_title" style="margin-bottom: 16px; padding: 16px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 2px 2px 8px #ddd;">
                         <group>
-                            <field name="criteria_id" />
-                            <field name="option_id" invisible="criteria_id == False" domain="[('rubric_id', '=', criteria_id)]" required="1"/>
-                            <field name="criteria_option_point" readonly="1"/>
-                            <field name="assess_explanation" required="1"/>
+                            <field name="criteria_id" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="option_id" invisible="criteria_id == False" domain="[('rubric_id', '=', criteria_id)]" required="1" options="{'no_create': True, 'no_open': True}"/>
+                            <field name="criteria_option_point" invisible="criteria_id == False" readonly="1"/>
+                            <field name="assess_explanation" invisible="criteria_id == False" required="1"/>
                         </group>
                     </div>
                 </group>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_open_response_rubric_staff_form" model="ir.ui.view">
+        <field name="name">open.response.rubric.staff.form</field>
+        <field name="model">open.response.rubric.staff</field>
+        <field name="arch" type="xml">
+            <form string="Peer Assessment">
+                <sheet>
+                    <group col="2">
+                        <group>
+                            <field name="response_id"/>
+                            <field name="assess_type"/>
+                            <field name="user_id"/>
+                        </group>
+                        <group>
+                            <field name="total_score"/>
+                            <field name="state"/>
+                            <field name="submitted_date"/>
+                        </group>
+                    </group>
+
+                    <separator string="Options" colspan="2"/>
+
+                    <field name="option_ids">
+                        <list>
+                            <field name="criteria_id" domain="[('slide_id', '=', slide_id)]"/>
+                            <field name="criteria_desc"/>
+                            <field name="option_id" domain="[('rubric_id', '=', criteria_id)]"/>
+                            <field name="criteria_option_desc"/>
+                            <field name="criteria_option_point"/>
+                            <field name="assess_explanation"/>
+                        </list>
+                    </field>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

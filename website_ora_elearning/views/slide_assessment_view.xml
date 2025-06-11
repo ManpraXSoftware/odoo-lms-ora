@@ -94,14 +94,13 @@
                             <group>
                                 <field name="slide_id" readonly="1"/>
                                 <field name="channel_id" readonly="1"/>
-                                <field name="create_date" readonly="1"/>
                                 <field name="user_id" readonly="1"/>
-                                <field name="submitted_date" readonly="0"/>
+                                <field name="staff_id" readonly="state in ('assessed', 'inactive')"/>
                             </group>
                             <group>
-                                <field name="staff_id" readonly="state in ('assessed', 'inactive')"/>
+                                <field name="create_date" readonly="1"/>
+                                <field name="submitted_date" readonly="1"/>
                                 <field name="xp_points"/>
-                                <field name="peer_status" readonly="1"/>
                             </group>
                         </group>
                         <notebook>

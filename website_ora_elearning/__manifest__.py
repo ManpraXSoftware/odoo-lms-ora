@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'views/slide_assessment_view.xml',
         'views/slide_channel_form_view.xml',
+        'views/open_response_rubric_form.xml',
         'views/templates.xml',
         'views/slide_fullscreen_view.xml',
         'views/mark_accessed_wizard.xml',
