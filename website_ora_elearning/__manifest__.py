@@ -27,6 +27,9 @@
             'website_ora_elearning/static/src/js/website_ora.js',
             'website_ora_elearning/static/src/xml/slide_ora.xml',
         ],
+        'web.assets_backend': [
+            'website_ora_elearning/static/src/js/kanban_textarea_save.js',
+        ],
     },
     'qweb': [],
     'images': ["static/description/images/banner.png"],

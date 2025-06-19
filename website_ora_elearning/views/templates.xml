@@ -23,7 +23,7 @@
                         display: inline;
                     }
                 </style>
-                    <div class="o_wslides_js_ora_container o_user_response" id="lessonAssessment" t-att-data-slide-id="slide.id" name="slide" value="slide.id">
+                    <div class="o_wslides_js_ora_container o_user_response" id="lessonAssessment" t-att-data-slide-id="slide.id" name="slide" value="slide.id" style="background-color: #fcfcfd;">
                         <t t-if="total_responses">
                             <t t-if="inactive_response">
                                 <t t-foreach="inactive_response" t-as="response">
@@ -57,7 +57,7 @@
                                                             t-attf-data-bs-target="#collapse_div_{{response.id}}"
                                                             t-attf-aria-controls="collapse_div"
                                                             data-bs-toggle="collapse"
-                                                            t-attf-style="float:right;position:relative;"
+                                                            t-attf-style="float:right;position:relative;margin-bottom: 10px;margin-right: 10px;"
                                                             type="button">
                                                         <span id='response_button_text'>View Response</span>
                                                     </button>
@@ -128,7 +128,7 @@
                                                             t-attf-data-bs-target="#collapse_div_{{response.id}}"
                                                             t-attf-aria-controls="collapse_div"
                                                             data-bs-toggle="collapse"
-                                                            t-attf-style="float:right;position:relative;"
+                                                            t-attf-style="float:right;position:relative;margin-bottom: 10px;margin-right: 10px;"
                                                             type="button">
                                                         <span id='response_button_text'>View Response</span>
                                                     </button>
@@ -201,7 +201,7 @@
                                                             t-attf-data-bs-target="#collapse_div_{{response.id}}"
                                                             t-attf-aria-controls="collapse_div"
                                                             data-bs-toggle="collapse"
-                                                            t-attf-style="float:right;position:relative;"
+                                                            t-attf-style="float:right;position:relative;margin-bottom: 10px;margin-right: 10px;"
                                                             type="button">
                                                         <span id='response_button_text'>View Response</span>
                                                     </button>
@@ -268,7 +268,7 @@
                                                 <t t-call="website_ora_elearning.lesson_active_response_prompts"/>
                                             </t>
                                         </div>
-                                        <div class="mt-3" style="margin-left:13px;">
+                                        <div class="mt-3" style="margin-left:13px;margin-right:13px;">
                                             <button t-att-class="'o_wslides_js_lesson_ora_submit btn btn-primary %s' % ('d-none' if not (slide.channel_id.is_member) else '')" type="submit" name="submit" value="save">
                                                 <span>Save Your Progress</span>
                                             </button>
@@ -337,6 +337,7 @@
                 <t t-foreach="slide_prompts" t-as="prompt">
                     <t t-call="website_ora_elearning.lesson_content_quiz_prompt_assessed"/>
                 </t>
+                <br />
                 <input type="hidden" name="slide_id" t-att-value="slide.id" />
                 <h5 style="text-align: center;">
                     <span style="font-weight: bold;">Assessment</span>
@@ -407,10 +408,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start">
-                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
                         </span>
-                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                        <div class="question_text ml-2" style="font-size: 15px; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group">
@@ -440,10 +441,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
                         </span>
-                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                        <div class="question_text ml-2" style="font-size: 15px; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group">
@@ -493,7 +494,7 @@
                                         <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
                                     </t>
                                     <t t-if="prompt['response_type'] == 'rich_text'">
-                                        <span t-out="user_input.value_richtext_box"/>
+                                        <span t-esc="user_input.value_richtext_box"/>
                                     </t>
                                 </t>
                             </t>
@@ -508,10 +509,10 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start" style="display:inline-flex;">
-                        <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
                         </span>
-                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                        <div class="question_text ml-2" style="font-size: 15px; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="list-group flex-row">
@@ -519,17 +520,17 @@
                         <t t-if="user_input.prompt_id.id == prompt['id']">
                             <t t-if="prompt['response_type'] == 'text'">
                                 <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer: </span>
+                                    <span style="display: flex; color: black;font-size: 15px;margin-right:8px;">Answer: </span>
                                 </small>
-                                <div class="input-group ml-1" style="line-height:1">
+                                <div class="input-group ml-1">
                                     <t t-esc="user_input.value_text_box"/>
                                 </div>
                             </t>
                             <t t-if="prompt['response_type'] == 'rich_text'">
                                 <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 14px;margin-right:8px;">Answer: </span>
+                                    <span style="display: flex; color: black;font-size: 15px;margin-right:8px;">Answer: </span>
                                 </small>
-                                <div class="ml-1" style="line-height:1">
+                                <div class="ml-1">
                                     <span t-field="user_input.value_richtext_box"/>
                                 </div>
                             </t>
@@ -547,25 +548,29 @@
                         <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
                             Question <t t-out="prompt.get('sequence', 0) + 1"/>:
                         </span>
-                        <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                        <div class="question_text ml-2" style="font-size: 15px; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
                     </div>
                 </div>
                 <div class="row mb-2">
                     <div style="display:inline-flex;line-height:1">
-                        <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
+                        <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_input">
                             <t t-if="user_input.prompt_id.id == prompt['id']">
                                 <t t-if="prompt['response_type'] == 'text'">
                                     <small class="text-muted">
                                         <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right:8px;">Answer: </span>
                                     </small>
-                                    <span class="ml-1" style="line-height: 1; font-size: 15px; color: black;">
-                                        <t t-if="prompt['response_type'] == 'text'">
-                                            <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
-                                        </t>
-                                        <t t-if="prompt['response_type'] == 'rich_text'">
-                                            <span t-out="user_input.value_richtext_box"/>
-                                        </t>
+                                    <span class="ml-1" style="font-size: 15px; color: black;">
+                                        <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
                                     </span>
+                                    <br/>
+                                </t>
+                                <t t-if="prompt['response_type'] == 'rich_text'">
+                                    <small class="text-muted">
+                                        <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right:8px;">Answer: </span>
+                                    </small>
+                                    <div class="ml-1" style="font-size: 15px; color: black;">
+                                        <t t-raw="user_input.value_richtext_box"/>
+                                    </div>
                                     <br/>
                                 </t>
                             </t>

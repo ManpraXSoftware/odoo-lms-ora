@@ -6,7 +6,7 @@
                 display: inline;
             }
         </style>
-            <div class="o_wslides_fs_quiz_container o_wslides_wrap h-100 w-100 pb-5 o_user_response" style="background-color: rgb(236 236 236)">
+            <div class="o_wslides_fs_quiz_container o_wslides_wrap w-100 o_user_response" style="background-color: rgb(236 236 236);overflow-x:hidden;">
                 <ul class="nav nav-tabs o_wslides_lesson_nav" role="tablist">
                     <li class="nav-item">
                         <a href="#ora_assessment" aria-controls="ora_assessment" data-oe-model="slide.slide" class="nav-link active" role="tab" data-bs-toggle="tab">
@@ -304,9 +304,9 @@
             </t>
             <t t-foreach="response.slide_rubric_staff_line" t-as="staff_line" t-key="staff_line">
                 <t t-if="staff_line.assess_type == 'staff'">
-                    <h3 class="text-center mt-3">
+                    <h4 class="text-center mt-5">
                         <span style="font-weight: bold;">Assessment</span>
-                    </h3>
+                    </h4>
                     <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
                     <div class="tableBox" style="overflow-x: auto">
                         <table class="table-bordered table" style="table-layout: auto;line-height: 50px;">
@@ -320,10 +320,12 @@
                                             <t t-if="res_rubric.id == rubric.id">
                                                 <td t-attf-style="background-color:#{res_rubric.name == option.name and '#d9edf7'};
                                                 overflow-wrap: anywhere;text-align: center;vertical-align: middle;">
-                                                    <span t-esc="option.name"/>
                                                     <t t-if="res_rubric.name == option.name">
-                                                        (<span style="margin-right:2px;" t-esc="res_rubric.criteria_option_point"></span>points)
-                                                        <br/>
+                                                        <span>
+                                                            <t t-esc="option.name"/>
+                                                            (<t t-esc="res_rubric.criteria_option_point"/> points)
+                                                        </span>
+                                                        <br />
                                                         <t t-if="res_rubric.assess_explanation">
                                                             <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
                                                         </t>
@@ -353,10 +355,10 @@
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-top: 15px;margin-left: 7px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
-                    <span style="display: flex; color: black; font-size: 14px; margin-right: 8px;">
+                    <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px;">
                         Question <t t-out="prompt['sequence'] + 1"/>:
                     </span>
-                    <div class="question_text ml-2" style="line-height:1.2; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>
+                    <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;" t-out="prompt['question']"/>
                 </div>
             </div>
             <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id">
@@ -371,7 +373,7 @@
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
                                 <span class="input-group-text">Your Response</span>
-                                <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}">
+                                <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}" style="background-color: white;">
                                     <textarea class="form-control o_wysiwyg_loader" 
                                         t-att-name="prompt.id" required="required">
                                         <t t-esc="user_input.value_richtext_box"/>
@@ -390,7 +392,7 @@
                     </t>
                     <t t-if="prompt.response_type == 'rich_text'">
                         <span class="input-group-text">Your Response</span>
-                        <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}">
+                        <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}" style="background-color: white;">
                             <textarea class="form-control s_website_form_input o_wysiwyg_loader" t-att-name="prompt.id" required="required"></textarea>
                         </div>
                     </t>
@@ -420,21 +422,17 @@
                     <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
                         <t t-if="user_input.prompt_id == prompt.id">
                             <t t-if="prompt.response_type == 'text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 15px;margin-right:8px;">Answer: </span>
-                                </small>
-                                <span class="ml-1">
+                                <div style="display: flex; color: black; font-size: 15px; margin-bottom: 5px;">
+                                    <span style="margin-right: 8px;">Answer:</span>
                                     <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
-                                </span>
+                                </div>
                                 <br />
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
-                                <small class="text-muted">
-                                    <span style="display: flex; color: black;font-size: 15px;margin-right:8px;">Answer : </span>
-                                </small>
-                                <span class="ml-1">
-                                    <span t-out="user_input.value_richtext_box"/>
-                                </span>
+                                <div style="display: flex; color: black; font-size: 15px; margin-bottom: 5px;">
+                                    <span style="margin-right: 8px;">Answer:</span>
+                                    <span style="white-space: break-spaces;" t-out="user_input.value_richtext_box"/>
+                                </div>
                                 <br/>
                             </t>
                         </t>

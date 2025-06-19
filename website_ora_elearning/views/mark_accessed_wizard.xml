@@ -10,14 +10,19 @@
                     <field name="user_response_lines" nolabel="1">
                         <kanban>
                             <field name="question_name"/>
-                            <field name="value_combined"/>
                             <field name="slide_id"/>
                             <templates>
                                 <t t-name="card">
                                     <div class="oe_kanban_card oe_kanban_global_click">
                                         <div class="oe_kanban_details">
                                             <strong><field name="question_name"/></strong>
-                                            <div><field name="value_combined"/></div>
+                                            <br />
+                                            <t t-if="record.value_text_box.raw_value">
+                                                <div><field name="value_text_box" /></div>
+                                            </t>
+                                            <t t-if="record.value_richtext_box.raw_value">
+                                                <div><field name="value_richtext_box" style="height: 300px; width:300px;"/></div>
+                                            </t>
                                         </div>
                                     </div>
                                 </t>
@@ -40,7 +45,6 @@
                                             <strong><field name="user_id"/></strong>
                                             <div>Submitted: <field name="submitted_date"/></div>
                                             <div>State: <field name="state"/></div>
-                                            <!-- <div>Score: <field name="total_score"/> Points</div> -->
                                             <div>
                                                 Score: <field name="total_score"/>
                                                 <t t-if="record.total_score == 1 or record.total_score == 0"> Point</t>
@@ -54,16 +58,29 @@
                     </field>
                 </group>
 
-                <group string="Create Slide Rubric Staff Line">
-                    <div class="oe_title" style="margin-bottom: 16px; padding: 16px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 2px 2px 8px #ddd;">
-                        <group>
-                            <field name="criteria_id" options="{'no_create': True, 'no_open': True}"/>
-                            <field name="option_id" invisible="criteria_id == False" domain="[('rubric_id', '=', criteria_id)]" required="1" options="{'no_create': True, 'no_open': True}"/>
-                            <field name="criteria_option_point" invisible="criteria_id == False" readonly="1"/>
-                            <field name="assess_explanation" invisible="criteria_id == False" required="1"/>
-                        </group>
-                    </div>
-                </group>
+                <form string="Confirm Assessment">
+                    <group string="Rubric Assessment">
+                        <field name="assess_line_ids" nolabel="1">
+                            <kanban editable="top" create="false" delete="false" can_open="0">
+                                <field name="criteria_id"/>
+                                <field name="option_id"/>
+                                <field name="assess_explanation"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <div class="oe_kanban_card">
+                                            <div><strong>Criteria:</strong> <field name="criteria_id"/></div>
+                                            <div><strong>Option:</strong> <field name="option_id" widget="selection"/></div>
+                                            <div><strong>Explanation:</strong>
+                                            <field name="assess_explanation" widget="text" options="{'editable': true}" style="width: 100%; height: 100px;"/></div> 
+                                            <!-- <textarea widget="kanban_textarea_handler" t-attf-name="response_{option_id}" style="width: 100%; height: 100px;" /></div> -->
+                                            <!-- </div> -->
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
+                </form>
 
                 <footer>
                     <button string="Confirm" type="object" name="confirm_assessment" class="btn-primary"/>

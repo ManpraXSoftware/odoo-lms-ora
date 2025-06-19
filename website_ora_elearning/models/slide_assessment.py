@@ -241,16 +241,29 @@ class ORAResponse(models.Model):
                 
     def action_mark_assessed(self):
         self.ensure_one()
+
+        # Step 1: Create wizard record
+        wizard = self.env['mark.assessed.wizard'].create({
+            'response_id': self.id,
+        })
+
+        # Step 2: Get rubrics and create lines for the wizard
+        slide_rubrics = self.env['open.response.rubric'].search([('slide_id', '=', self.slide_id.id)])
+        for rubric in slide_rubrics:
+            self.env['rubric.assess.line.wizard'].create({
+                'wizard_id': wizard.id,
+                'criteria_id': rubric.id,
+            })
+
+        # Step 3: Open wizard window
         return {
             'type': 'ir.actions.act_window',
-            'name': 'Confirm Assessment',
             'res_model': 'mark.assessed.wizard',
             'view_mode': 'form',
+            'res_id': wizard.id,
             'target': 'new',
-            'context': {
-                'default_response_id': self.id,
-            },
         }
+
 
 class OpenResponseUserLine(models.Model):
     _name = 'open.response.user.line'
@@ -264,22 +277,6 @@ class OpenResponseUserLine(models.Model):
     question_name = fields.Html("Question", related='prompt_id.question_name', store=True, translate=tools.html_translate, sanitize_attributes=False, sanitize_form=False)
     question_sequence = fields.Integer('Sequence', related='prompt_id.sequence', store=True)
     response_type = fields.Selection(string="Response Type", related="prompt_id.response_type")
-    value_combined = fields.Text(
-        string="Answer",
-        compute="_compute_value_combined"
-    )
-    @api.depends('value_text_box', 'value_richtext_box')
-    def _compute_value_combined(self):
-        for rec in self:
-            if rec.value_text_box:
-                rec.value_combined = rec.value_text_box
-            elif rec.value_richtext_box:
-                # Strip HTML tags
-                plain_text = re.sub('<[^<]+?>', '', rec.value_richtext_box)
-                rec.value_combined = plain_text
-            else:
-                rec.value_combined = ''
-
 
 class OpenResponseRubricStaff(models.Model):
     _name = 'open.response.rubric.staff'

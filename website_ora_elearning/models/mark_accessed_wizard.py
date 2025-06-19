@@ -26,43 +26,12 @@ class MarkAssessedWizard(models.TransientModel):
         readonly=True,
         string="Slide"
     )
-    criteria_id = fields.Many2one(
-        'open.response.rubric',
-        string='Criteria',
-        required=True,
-        domain="[('slide_id', '=', slide_id)]"
-    )
-    criteria_desc = fields.Text(
-        related='criteria_id.name',
-        readonly=True,
-        string="Criteria Description"
-    )
-    option_id = fields.Many2one(
-        'rubric.criterian',
-        string='Options',
-        required=True,
-        domain="[('rubric_id', '=', criteria_id)]"
-    )
-    criteria_option_desc = fields.Text(
-        related='option_id.option_desc',
-        readonly=True,
-        string="Option Description"
-    )
-    criteria_option_point = fields.Integer(
-        related='option_id.option_points',
-        readonly=True,
-        string="Option Points"
-    )
-    assess_explanation = fields.Text(
-        string="Assess Explanation",
-        required=True,
-        translate=True
-    )
     response_assess_id = fields.Many2one(
         'open.response.rubric.staff',
         ondelete="cascade",
         string="Response Assessment"
     )
+    assess_line_ids = fields.One2many('rubric.assess.line.wizard', 'wizard_id', string="Rubric Lines")
 
     @api.depends('response_id')
     def _compute_user_response_lines(self):
@@ -80,6 +49,14 @@ class MarkAssessedWizard(models.TransientModel):
             ])
 
     def confirm_assessment(self):
+        # Step 0: Update explanation values from request.params (manual textarea capture)
+        post_data = self.env.context.get('params') or {}
+        for line in self.assess_line_ids:
+            textarea_key = f'assess_explanation_{line.id}'
+            if textarea_key in post_data:
+                line.assess_explanation = post_data[textarea_key]
+
+        # Step 1: Validations
         if not self.response_id:
             raise UserError("Response not found.")
 
@@ -90,10 +67,11 @@ class MarkAssessedWizard(models.TransientModel):
         if self.response_id.state != 'submitted':
             raise UserError("Only submitted slides can be assessed.")
 
-        if not (self.criteria_id and self.option_id and self.assess_explanation):
-            raise UserError("Please fill in all required rubric fields before confirming assessment.")
+        for line in self.assess_line_ids:
+            if not (line.criteria_id and line.option_id):
+                raise UserError("Please fill in all required rubric fields before confirming assessment.")
 
-        # Step 1: Create a staff assessment entry (parent record)
+        # Step 2: Create the staff assessment parent record
         staff_assess = self.env['open.response.rubric.staff'].create({
             'response_id': self.response_id.id,
             'assess_type': 'staff',
@@ -101,58 +79,81 @@ class MarkAssessedWizard(models.TransientModel):
             'state': 'completed',
         })
 
-        # Step 2: Create the rubric line linked to this staff assessment
-        self.env['open.response.rubric.assess'].create({
-            'response_assess_id': staff_assess.id,
-            'criteria_id': self.criteria_id.id,
-            'option_id': self.option_id.id,
-            'assess_explanation': self.assess_explanation,
-        })
+        total_score = 0
 
-        # Step 3: Update state and karma
+        # Step 3: Create rubric assess lines
+        for line in self.assess_line_ids:
+            point = line.option_id.option_points or 0
+            total_score += point
+
+            self.env['open.response.rubric.assess'].create({
+                'response_assess_id': staff_assess.id,
+                'criteria_id': line.criteria_id.id,
+                'option_id': line.option_id.id,
+                'assess_explanation': line.assess_explanation or '',
+                'criteria_option_point': point,
+            })
+
+        # Step 4: Update total score
+        staff_assess.total_score = total_score
+
+        # Step 5: Update response state and give karma
         self.response_id.state = 'assessed'
         slide.sudo().user_id.karma += self.response_id.xp_points or 0
-        if not staff_assess:
-            raise UserError('Staff could not be able to assess the assessment')
-        else:
-            if slide.notify_user:
-                template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
-                base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-                action = self.env.ref('website_ora_elearning.action_ora_response')
-                url = f"{base_url}/odoo/action-{action.id}/{self.response_id.id}"
-                if template:
-                    template.sudo().with_context(
-                        slide_name=slide.name,
-                        user_email=self.response_id.user_id.email,
-                        user_name=self.response_id.user_id.name,
-                        staff_name=self.response_id.staff_id.sudo().partner_id.name,
-                        url=url
-                    ).send_mail(self.response_id.id, force_send=True)
-                msg = self.env['mail.message'].create({
-                    'model': 'res.partner',
-                    'res_id': slide.user_id.partner_id.id,
-                    'message_type': 'comment',
-                    'subtype_id': self.env.ref('mail.mt_comment').id,
-                    'author_id': self.env.user.partner_id.id,
-                    'body': f"""
-                        <p>Your assessment for the ORA content <strong>{slide.name}</strong> has been reviewed and evaluated by staff member <strong>{self.response_id.staff_id.sudo().partner_id.name}</strong>.</p>
-                        <div style="padding: 16px 8px; text-align: center;">
-                            <a href="{url}"
-                            style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                                View ORA Response
-                            </a>
-                        </div>
-                        <p>We hope you enjoy this feedback and continue learning with us!</p>
-                        <br/>
-                        <p>Best regards,<br/>
-                        {self.response_id.user_id.partner_id.name or ''}</p>
-                    """,
-                })
-                self.env['mail.notification'].create({
-                    'author_id': msg.author_id.id,
-                    'mail_message_id': msg.id,
-                    'res_partner_id': slide.user_id.partner_id.id,
-                    'notification_type': 'inbox',
-                    'notification_status': 'sent',
-                })
+
+        # Step 6: Send email and notification
+        if slide.notify_user:
+            template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
+            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            action = self.env.ref('website_ora_elearning.action_ora_response')
+            url = f"{base_url}/odoo/action-{action.id}/{self.response_id.id}"
+
+            if template:
+                template.sudo().with_context(
+                    slide_name=slide.name,
+                    user_email=self.response_id.user_id.email,
+                    user_name=self.response_id.user_id.name,
+                    staff_name=self.response_id.staff_id.sudo().partner_id.name,
+                    url=url
+                ).send_mail(self.response_id.id, force_send=True)
+
+            msg = self.env['mail.message'].create({
+                'model': 'res.partner',
+                'res_id': slide.user_id.partner_id.id,
+                'message_type': 'comment',
+                'subtype_id': self.env.ref('mail.mt_comment').id,
+                'author_id': self.env.user.partner_id.id,
+                'body': f"""
+                    <p>Your assessment for the ORA content <strong>{slide.name}</strong> has been reviewed and evaluated by staff member <strong>{self.response_id.staff_id.sudo().partner_id.name}</strong>.</p>
+                    <div style="padding: 16px 8px; text-align: center;">
+                        <a href="{url}" style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                            View ORA Response
+                        </a>
+                    </div>
+                    <p>We hope you enjoy this feedback and continue learning with us!</p>
+                    <br/>
+                    <p>Best regards,<br/>
+                    {self.response_id.user_id.partner_id.name or ''}</p>
+                """,
+            })
+            self.env['mail.notification'].create({
+                'author_id': msg.author_id.id,
+                'mail_message_id': msg.id,
+                'res_partner_id': slide.user_id.partner_id.id,
+                'notification_type': 'inbox',
+                'notification_status': 'sent',
+            })
+
         return {'type': 'ir.actions.act_window_close'}
+
+
+    
+class RubricAssessLineWizard(models.TransientModel):
+    _name = 'rubric.assess.line.wizard'
+    _description = 'Rubric Assess Line Wizard'
+
+    wizard_id = fields.Many2one('mark.assessed.wizard', string="Wizard")
+    criteria_id = fields.Many2one('open.response.rubric', string="Criteria", readonly=True)
+    option_id = fields.Many2one('rubric.criterian', "Option", domain="[('rubric_id', '=', criteria_id)]")
+    criteria_option_point = fields.Integer(related='option_id.option_points')
+    assess_explanation = fields.Text(string="Assess Explanation")
