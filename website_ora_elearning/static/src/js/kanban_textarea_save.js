@@ -2,65 +2,44 @@
 
 import { onMounted } from "@odoo/owl";
 import { registry } from "@web/core/registry";
-import { useService } from "@web/core/utils/hooks";
+import { rpc } from "@web/core/network/rpc";
 
 const { Component } = owl;
 
 class KanbanTextareaHandler extends Component {
+    static template = "website_ora_elearning.kanban_textarea";
+    static props = {
+        record: Object,
+        readonly: Boolean,
+    };
+
     setup() {
-        this.rpc = useService("rpc");
-
         onMounted(() => {
-            const textareas = document.querySelectorAll(".assess_explanation_input");
-            const selects = document.querySelectorAll("[name='option_id']");
-
-            textareas.forEach(textarea => {
-                textarea.addEventListener("change", (ev) => this._onTextareaChange(ev));
-                textarea.addEventListener("input", (ev) => {
-                    textarea.classList.add("unsaved");
-                });
-            });
-
-            selects.forEach(select => {
-                select.addEventListener("mousedown", (ev) => {
-                    // Before changing option_id, auto-save assess_explanation if dirty
-                    const card = select.closest(".oe_kanban_card");
-                    const textarea = card.querySelector(".assess_explanation_input");
-                    if (textarea && textarea.classList.contains("unsaved")) {
-                        this._saveTextarea(textarea);
-                        textarea.classList.remove("unsaved");
-                    }
-                });
-            });
+            this.textarea = document.querySelector(".kanban-textarea");
+            if (this.textarea) {
+                this.textarea.addEventListener("blur", this.save.bind(this));
+            }
         });
     }
 
-    async _onTextareaChange(ev) {
-        const textarea = ev.currentTarget;
-        await this._saveTextarea(textarea);
-        textarea.classList.remove("unsaved");
-    }
-
-    async _saveTextarea(textarea) {
-        const value = textarea.value?.trim();
-        const recordId = parseInt(textarea.dataset.id);
-        const model = textarea.dataset.model;
-        const field = textarea.dataset.field;
-
-        if (!recordId || !model || !field) return;
-
+    async onInputChange(ev) {
+        const value = ev.target.value;
+        const recordId = this.props.record.resId;
         try {
-            await this.rpc("/web/dataset/call_kw/" + model + "/write", {
-                model: model,
+            await rpc("/web/dataset/call_kw/rubric.assess.line.wizard/write", {
+                model: 'rubric.assess.line.wizard',
                 method: "write",
-                args: [[recordId], { [field]: value }],
+                args: [[recordId], { assess_explanation: value }],
                 kwargs: {},
             });
-            console.log(`Saved ${field} for record ${recordId}`);
         } catch (error) {
-            console.error("Error saving field:", error);
+            console.error("Error saving textarea:", error);
         }
     }
 }
 
-registry.category("actions").add("kanban_textarea_handler", KanbanTextareaHandler);
+export const kanbantextareahandler = {
+    component: KanbanTextareaHandler,
+};
+
+registry.category("view_widgets").add("kanban_textarea_handler", kanbantextareahandler);

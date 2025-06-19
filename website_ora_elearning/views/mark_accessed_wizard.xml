@@ -68,12 +68,11 @@
                                 <templates>
                                     <t t-name="card">
                                         <div class="oe_kanban_card">
-                                            <div><strong>Criteria:</strong> <field name="criteria_id"/></div>
-                                            <div><strong>Option:</strong> <field name="option_id" widget="selection"/></div>
-                                            <div><strong>Explanation:</strong>
-                                            <field name="assess_explanation" widget="text" options="{'editable': true}" style="width: 100%; height: 100px;"/></div> 
-                                            <!-- <textarea widget="kanban_textarea_handler" t-attf-name="response_{option_id}" style="width: 100%; height: 100px;" /></div> -->
-                                            <!-- </div> -->
+                                            <div class="oe_kanban_details">
+                                                <div style="margin-bottom: 10px;"><strong>Criteria:</strong> <field name="criteria_id" style="margin-left:10px;"/></div>
+                                                <div style="margin-bottom: 10px;"><strong>Option:</strong> <field name="option_id" widget="selection" style="width:80%;margin-left:10px;display: inline-block;"/></div>
+                                                <div style="margin-bottom: 10px;"><strong>Explanation:</strong> <widget name="kanban_textarea_handler" /></div>
+                                            </div>
                                         </div>
                                     </t>
                                 </templates>

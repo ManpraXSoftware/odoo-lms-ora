@@ -29,6 +29,7 @@
         ],
         'web.assets_backend': [
             'website_ora_elearning/static/src/js/kanban_textarea_save.js',
+            'website_ora_elearning/static/src/xml/kanban_text_widget_view.xml',
         ],
     },
     'qweb': [],
