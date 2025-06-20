@@ -147,7 +147,7 @@
                                             <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" name="submit" value="save" type="button">
                                                 <span>Save Your Progress</span>
                                             </button>
-                                            <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" style="float:right;" name="submit" value="submit" type="button">
+                                            <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" style="float:right;margin-bottom: 10px;" name="submit" value="submit" type="button">
                                                 <span>Submit</span>
                                             </button>
                                         </div>
@@ -167,7 +167,7 @@
                                     <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" name="submit" value="save" type="button" style="margin-left:6px;">
                                         <span>Save Your Progress</span>
                                     </button>
-                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" style="float:right;" name="submit" value="submit" type="button">
+                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" style="float:right;margin-bottom: 10px;" name="submit" value="submit" type="button">
                                         <span>Submit</span>
                                     </button>
                                 </div>

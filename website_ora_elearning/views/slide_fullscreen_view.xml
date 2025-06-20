@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <template id="slide_fullscreen_inherit" inherit_id="website_slides.slide_fullscreen">
+            <xpath expr="//div[@class='o_wslides_fs_container d-flex position-relative overflow-hidden flex-grow-1']" position="attributes">
+                <attribute name="class">o_wslides_fs_container d-flex position-relative flex-grow-1</attribute>
+            </xpath>
+        </template>
         <template id="slide_fullscreen_sidebar_category_ora_inherit" inherit_id="website_slides.slide_fullscreen_sidebar_category">
             <ul class="list-unstyled w-100 small fw-light" position="attributes">
                 <t t-if="'is_sequential' not in slide.fields_get()">
