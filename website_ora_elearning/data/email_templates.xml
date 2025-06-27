@@ -6,24 +6,58 @@
             <field name="name">Peer Review Submitted</field>
             <field name="model_id" ref="website_ora_elearning.model_open_response_rubric_staff"/>
             <field name="subject">Peer Review Submitted - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">odoobot@example.com</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="email_to">{{ ctx.get('peer_user_email') }}</field>
-            <field name="body_html">
-                <![CDATA[
-                    <p>Hello <span t-out="ctx.get('peer_user_name')"></span>,</p>
-                    <p>User <span t-out="ctx.get('user_name')"></span> has submitted their response for peer review.</p>
-                    <p>You can view the submission using the link below:</p>
-                    <div style="padding: 16px 8px;">
-                        <a t-att-href="ctx.get('slide_url')"
-                            style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                                View ORA Response
-                        </a>
+            <field name="body_html" type ="html">
+<table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" width="590" cellpadding="0" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;" summary="o_mail_notification">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="middle">
+                    <span style="font-size: 10px;">Peer Review Notification</span><br/>
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 14px;">
+                    <div>
+                        Hello <strong><t t-out="ctx.get('peer_user_name')"/></strong>,<br />
+                        User <strong><t t-out="ctx.get('user_name')"/></strong> has submitted their response for peer review.<br />
+                        You can view the submission using the button below:<br /><br />
+                        <a t-att-href="ctx.get('slide_url')" style="background-color: #875a7b; padding: 8px 16px; color: #fff; border-radius: 5px; text-decoration: none;">View ORA Response</a><br /><br />
+                        This submission is part of the course: <strong><t t-out="ctx.get('slide_name')"/></strong>.<br />
+                        Thank you for your valuable feedback.<br />
+                        <strong>The ORA Team</strong><br />
                     </div>
-                    <p>This submission is part of the course content titled <strong t-out="ctx.get('slide_name')"></strong>.</p>
-                    <p>Your thoughtful review and feedback are highly appreciated.</p>
-                    <p>Thank you!</p>
-                    <p><strong>The ORA Team</strong></p>
-                ]]>
+                </td></tr>
+                <tr><td style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr><td align="center" style="min-width: 590px;">
+    <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+      <tr><td style="text-align: center; font-size: 14px;">
+        Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=gamification" style="color: #875A7B;">Odoo</a>
+      </td></tr>
+    </table>
+</td></tr>
+</table>
             </field>
         </record>
 
@@ -31,23 +65,57 @@
             <field name="name">Staff Review Submitted</field>
             <field name="model_id" ref="website_ora_elearning.model_open_response_rubric_staff"/>
             <field name="subject">Staff Review Submitted - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">odoobot@example.com</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="email_to">{{ ctx.get('staff_email') }}</field>
-            <field name="body_html">
-                <![CDATA[
-                <t t-name="email_template_staff_review_submitted">
-                    <p>Hello <t t-esc="ctx.get('staff_name')"/>!</p>
-                    <p>User <strong><t t-esc="ctx.get('user_name')"/></strong> has submitted a response for your review.</p>
-                    <p>You can view the submission using the link below:</p>
-                    <a t-att-href="ctx.get('slide_url')"
-                        style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                            View ORA Response
-                    </a>
-                    <p>Please assess the submission related to the course slide: <strong><t t-esc="ctx.get('slide_name')"/></strong>.</p>
-                    <p>We appreciate your feedback.</p>
-                    <p>Thank you!</p>
-                </t>
-                ]]>
+            <field name="body_html" type ="html">
+<table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" width="590" cellpadding="0" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;" summary="o_mail_notification">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="middle">
+                    <span style="font-size: 10px;">Staff Review Notification</span><br/>
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 14px;">
+                    <div>
+                        Hello <strong><t t-out="ctx.get('staff_name')"/></strong>,<br />
+                        User <strong><t t-out="ctx.get('user_name')"/></strong> has submitted a response for your review.<br />
+                        Please review the submission related to the course slide: <strong><t t-out="ctx.get('slide_name')"/></strong>.<br /><br />
+                        <a t-att-href="ctx.get('slide_url')" style="background-color: #875a7b; padding: 8px 16px; color: #fff; border-radius: 5px; text-decoration: none;">View ORA Response</a><br /><br />
+                        Thank you for your assessment.<br />
+                        <strong>The ORA Team</strong><br />
+                    </div>
+                </td></tr>
+                <tr><td style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr><td align="center" style="min-width: 590px;">
+    <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+      <tr><td style="text-align: center; font-size: 14px;">
+        Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=gamification" style="color: #875A7B;">Odoo</a>
+      </td></tr>
+    </table>
+</td></tr>
+</table>
             </field>
         </record>
 
@@ -55,52 +123,119 @@
             <field name="name">Peer Assessment Completed</field>
             <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
             <field name="subject">Peer Assessments Completed - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">odoobot@example.com</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="email_to">{{ ctx.get('user_email') }}</field>
-            <field name="body_html"><![CDATA[
-                <div style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">
-                    <p>Hello,</p>
-                    <p>
-                        All peer assessments for the content titled 
-                        <strong><t t-esc="ctx.get('slide_name')"/></strong> have now been completed.
-                    </p>
-                    <p>You can view the learner's submission and assessment results using the link below:</p>
-                    <div style="padding: 16px 8px;">
-                        <a t-att-href="ctx.get('url')"
-                            style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                            View ORA Response
-                        </a>
+            <field name="body_html" type ="html">
+<table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" width="590" cellpadding="0" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;" summary="o_mail_notification">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="middle">
+                    <span style="font-size: 10px;">Peer Review Completed</span><br/>
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 14px;">
+                    <div>
+                        Hello,<br />
+                        All peer assessments for the content titled <strong><t t-out="ctx.get('slide_name')"/></strong> have now been completed.<br />
+                        You can view the learner's submission and assessment results using the link below:<br /><br />
+                        <a t-att-href="ctx.get('url')" style="background-color: #875a7b; padding: 8px 16px; color: #fff; border-radius: 5px; text-decoration: none;">View ORA Response</a><br /><br />
+                        We encourage you to review the submission at your earliest convenience.<br />
+                        Best regards,<br />
+                        <strong>The ORA Team</strong><br />
                     </div>
-                    <p>
-                        We encourage you to review the submission at your earliest convenience.
-                    </p>
-                    <p>Best regards,</p>
-                    <p><strong>The ORA Team</strong></p>
-                </div>
-            ]]></field>
+                </td></tr>
+                <tr><td style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr><td align="center" style="min-width: 590px;">
+    <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+      <tr><td style="text-align: center; font-size: 14px;">
+        Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=gamification" style="color: #875A7B;">Odoo</a>
+      </td></tr>
+    </table>
+</td></tr>
+</table>
+            </field>
         </record>
 
         <record id="email_template_assessment_completed" model="mail.template">
             <field name="name">Assessment Completed</field>
             <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
             <field name="subject">Your Assessment is Completed - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">odoobot@example.com</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="email_to">{{ ctx.get('user_email') }}</field>
-            <field name="body_html"><![CDATA[
-                <p>Hello <span t-out="ctx.get('user_name')"></span>,</p>
-                <p>Your submission for <strong><span t-out="ctx.get('slide_name')"></span></strong> has been reviewed and assessed by <strong><span t-out="ctx.get('staff_name')"></span></strong>.</p>
-                <p>You can access the feedback and evaluation here:</p>
-                <div style="padding: 16px 8px;">
-                    <a t-att-href="ctx.get('url')"
-                        style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                        View ORA Response
-                    </a>
-                </div>
-                <p>Please take a moment to review the comments provided.</p>
-                <p>Thank you for your participation!</p>
-                <p>Best regards,</p>
-                <p><strong>The ORA Team</strong></p>
-            ]]></field>
+            <field name="body_html" type ="html">
+<table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
+<table border="0" width="590" cellpadding="0" style="padding: 16px; background-color: white; color: #454748; border-collapse:separate;" summary="o_mail_notification">
+<tbody>
+    <!-- HEADER -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="middle">
+                    <span style="font-size: 10px;">Assessment Completed</span><br/>
+                </td></tr>
+                <tr><td colspan="2" style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+    <!-- CONTENT -->
+    <tr>
+        <td align="center" style="min-width: 590px;">
+            <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: white; padding: 0px 8px 0px 8px; border-collapse:separate;">
+                <tr><td valign="top" style="font-size: 14px;">
+                    <div>
+                        Hello <strong><t t-out="ctx.get('user_name')"/></strong>,<br />
+                        Your submission for <strong><t t-out="ctx.get('slide_name')"/></strong> has been reviewed and assessed by <t t-out="ctx.get('staff_name')"/>.<br />
+                        You can access the feedback and evaluation here:<br /><br />
+                        <a t-att-href="ctx.get('url')" style="background-color: #875a7b; padding: 8px 16px; color: #fff; border-radius: 5px; text-decoration: none;">View ORA Response</a><br /><br />
+                        Please take a moment to review the comments provided.<br />
+                        Thank you for your participation!<br />
+                        Best regards,<br />
+                        <strong>The ORA Team</strong><br />
+                    </div>
+                </td></tr>
+                <tr><td style="text-align:center;">
+                  <hr width="100%" style="background-color:rgb(204,204,204);border:medium none;clear:both;display:block;font-size:0px;min-height:1px;line-height:0; margin: 16px 0px 16px 0px;"/>
+                </td></tr>
+            </table>
+        </td>
+    </tr>
+</tbody>
+</table>
+</td></tr>
+<!-- POWERED BY -->
+<tr><td align="center" style="min-width: 590px;">
+    <table width="590" border="0" cellpadding="0" style="min-width: 590px; background-color: #F1F1F1; color: #454748; padding: 8px; border-collapse:separate;">
+      <tr><td style="text-align: center; font-size: 14px;">
+        Powered by <a target="_blank" href="https://www.odoo.com?utm_source=db&amp;utm_medium=gamification" style="color: #875A7B;">Odoo</a>
+      </td></tr>
+    </table>
+</td></tr>
+</table>
+            </field>
         </record>
     </data>
 </odoo>

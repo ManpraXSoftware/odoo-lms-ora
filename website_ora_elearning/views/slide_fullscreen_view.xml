@@ -7,6 +7,9 @@
             </xpath>
         </template>
         <template id="slide_fullscreen_sidebar_category_ora_inherit" inherit_id="website_slides.slide_fullscreen_sidebar_category">
+            <li t-attf-class="o_wslides_fs_sidebar_list_item d-flex py-1 #{'active' if slide.id == current_slide.id else ''}" position="attributes">
+                <attribute name="t-att-data-has-ora">1 if slide.prompt_ids else 0</attribute>
+            </li>
             <ul class="list-unstyled w-100 small fw-light" position="attributes">
                 <t t-if="'is_sequential' not in slide.fields_get()">
                     <attribute name="t-if">slide.prompt_ids or slide.sudo().slide_resource_ids or (slide.question_ids and not slide.slide_category =='quiz')</attribute>

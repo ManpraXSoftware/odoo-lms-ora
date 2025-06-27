@@ -111,10 +111,11 @@ class MarkAssessedWizard(models.TransientModel):
             if template:
                 template.sudo().with_context(
                     slide_name=slide.name,
-                    user_email=self.response_id.user_id.email,
+                    user_email=self.response_id.user_id.email_formatted,
                     user_name=self.response_id.user_id.name,
                     staff_name=self.response_id.staff_id.sudo().partner_id.name,
-                    url=url
+                    url=slide.website_url + '?fullscreen=1#',
+                    company_email = self.env.company.email_formatted,
                 ).send_mail(self.response_id.id, force_send=True)
 
             msg = self.env['mail.message'].create({

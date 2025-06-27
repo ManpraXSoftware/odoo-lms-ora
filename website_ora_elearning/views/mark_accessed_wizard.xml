@@ -21,7 +21,7 @@
                                                 <div><field name="value_text_box" /></div>
                                             </t>
                                             <t t-if="record.value_richtext_box.raw_value">
-                                                <div><field name="value_richtext_box" style="height: 300px; width:300px;"/></div>
+                                                <div style="width: 80px;"><field name="value_richtext_box" /></div>
                                             </t>
                                         </div>
                                     </div>

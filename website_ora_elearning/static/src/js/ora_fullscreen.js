@@ -52,18 +52,30 @@
                 slideData.isOra = !!slideData.isOra;
                 slideData.hasQuestion = !!slideData.hasQuestion;
                 try {
-                    if (!(slideData.isOra) && !(slideData.hasQuestion) && slideData.category != 'certification') {
+                    if (!!slideData.hasOra) {
+                        slideData._autoSetDone = false;
+                    } 
+                    else if (!(slideData.isOra) && !(slideData.hasQuestion) && slideData.category != 'certification') {
                         slideData._autoSetDone = true;
+                    }
+                    else {
+                        slideData._autoSetDone = false;
                     }
                 }
                 catch {
-                    if (!(slideData.hasQuestion) && slideData.category != 'certification') {
+                    if (!!slideData.hasOra) {
+                        slideData._autoSetDone = false;
+                    }
+                    else if (!(slideData.hasQuestion) && slideData.category != 'certification') {
                         slideData._autoSetDone = true;
+                    } else {
+                        slideData._autoSetDone = false;
                     }
                 }
             });
             return res;
         },
+
         _onChangeSlideRequest: function (ev) {
             var slideData = ev.data;
             var newSlide = findSlide(this.slides, {
@@ -256,6 +268,12 @@
                 data: data,
                 success: function (data) {
                     self._renderSlide();
+                    self.trigger_up('slide_completed', {
+                        slideId: self._slideValue.id,
+                        channelCompletion: 100,
+                        completed: true,
+                });
+                    // window.location.reload();
                 }
             });
         },

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import werkzeug
+import werkzeug.utils
+import werkzeug.exceptions
+
 from odoo import _, http
 from odoo.http import request, Response
 from odoo.exceptions import UserError
@@ -39,6 +43,15 @@ class WebsiteSlidesORA(WebsiteSlides):
             })
 
             self.add_answers(kwargs, user_response)
+            partner = request.env.user.partner_id
+            request.env['slide.slide.partner'].sudo().search([
+                ('slide_id', '=', slide.id),
+                ('partner_id', '=', partner.id)
+            ], limit=1).write({'completed': True})
+            # if slide_partner and not slide_partner.completed:
+            #     slide_partner.write({'completed': True})
+            # else:
+            #     slide_partner.write({'completed': False})
             if slide.peer_assessment:
                 peer_users = self._assign_peer_review_users(slide, user_response)
                 if slide.notify_peer:
@@ -107,12 +120,13 @@ class WebsiteSlidesORA(WebsiteSlides):
             if template:
                 template.sudo().with_context(
                     user_response_id=user_response.id,
-                    peer_user_email=peer.partner_id.email,
+                    peer_user_email=peer.partner_id.email_formatted,
                     peer_user_name=peer.partner_id.name,
                     user_id=request.env.user.id,
                     user_name=request.env.user.name,
                     slide_name=slide.name,
-                    slide_url=slide.website_url + '?fullscreen=1#'
+                    slide_url=slide.website_url + '?fullscreen=1#',
+                    company_email = request.env.company.email_formatted
                 ).send_mail(peer.id, force_send=True)
 
     def _notify_staff(self, slide, user_response):
@@ -157,7 +171,8 @@ class WebsiteSlidesORA(WebsiteSlides):
                 user_id=request.env.user.id,
                 user_name=request.env.user.name,
                 slide_name=slide.name,
-                slide_url=slide.website_url + '?fullscreen=1#'
+                slide_url=slide.website_url + '?fullscreen=1#',
+                company_email = request.env.company.email_formatted
             ).send_mail(staff.id, force_send=True)
 
     def _get_access_data(self, post, resubmit=False):
@@ -280,6 +295,18 @@ class WebsiteSlidesORA(WebsiteSlides):
                     }))
         return values
 
+    
+    def _slide_mark_completed(self, slide):
+        slide_partner = request.env['slide.slide.partner'].sudo().search([
+                ('slide_id', '=', slide.id),
+                ('partner_id', '=', request.env.user.partner_id.id)
+            ], limit=1)
+        if slide.prompt_ids and slide_partner and not slide_partner.completed:
+            return False
+        else:
+            slide.action_mark_completed()
+            return super(WebsiteSlidesORA, self)._slide_mark_completed(slide)
+    
     def _get_slide_values(self, slide):
         next_slide = slide.channel_id.slide_content_ids[((slide.channel_id.slide_content_ids.ids).index(slide.id))+1] if ((slide.channel_id.slide_content_ids.ids).index(slide.id)) < len(slide.channel_id.slide_content_ids.ids) - 1 else None
         return {
@@ -401,10 +428,11 @@ class WebsiteSlidesORA(WebsiteSlides):
         if template:
             template.sudo().with_context(
                 user_response_id=response.id,
-                user_email=response.staff_id.email,
+                user_email=response.staff_id.email_formatted,
                 slide_name=slide.name,
                 peer_emails=peer_email_str,
-                url=url
+                url=url,
+                company_email = request.env.company.email_formatted
             ).send_mail(response.id, force_send=True)
 
         peer_name_str = self._format_peer_names(peer_names)

@@ -11,6 +11,7 @@
     'depends': ['website_slides'],
     'data': [
         'data/ir_cron_data.xml',
+        'data/email_templates.xml',
         'security/ir.model.access.csv',
         'views/slide_assessment_view.xml',
         'views/slide_channel_form_view.xml',
@@ -18,7 +19,6 @@
         'views/templates.xml',
         'views/slide_fullscreen_view.xml',
         'views/mark_accessed_wizard.xml',
-        'data/email_templates.xml',
     ],
     'assets': {
         'web.assets_frontend': [

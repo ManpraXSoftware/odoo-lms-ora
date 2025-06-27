@@ -86,7 +86,7 @@
                             type="object"
                             string="Mark Assessed"
                             class="oe_highlight"
-                            invisible="state != 'submitted' or not peer_status in ('not_applicable','completed')"/>
+                            invisible="state != 'submitted' or not peer_status in ('not_applicable','completed') or staff_id != uid"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -130,7 +130,7 @@
                                                                 </p>
                                                             </t>
                                                             <t t-if="record.response_type.raw_value == 'rich_text'">
-                                                                <p style="overflow-wrap: break-word;">
+                                                                <p style="overflow-wrap: break-word;width: 80px;">
                                                                     <field name="value_richtext_box" widget="html"/>
                                                                 </p>
                                                             </t>
@@ -204,7 +204,7 @@
                     <field name="user_id"/>
                     <field name="staff_id"/>
                     <field name="state"/>
-                    <button name="action_mark_assessed" type="object" string="Mark Assessed" class="oe_highlight" invisible="state != 'submitted' or not peer_status in ('not_applicable','completed')"/>
+                    <button name="action_mark_assessed" type="object" string="Mark Assessed" class="oe_highlight" invisible="state != 'submitted' or not peer_status in ('not_applicable','completed') or staff_id != uid"/>
                 </list>
             </field>
         </record>
