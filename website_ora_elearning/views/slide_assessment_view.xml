@@ -27,7 +27,7 @@
                                         <label for="question_name"/>
                                         <field name="question_name"/>
                                         <label for="name"/>
-                                        <field name="name"/>
+                                        <field name="name" required="question_name == True"/>
                                         <label for="response_type"/>
                                         <field name="response_type"/>
                                     </form>
@@ -65,7 +65,7 @@
                                             invisible="peer_assessment == False"/>
                                     </group>
                                     <group string="Notification Settings">
-                                        <field name="notify_peer" />
+                                        <field name="notify_peer" invisible="peer_assessment == False" />
                                         <field name="notify_staff" />
                                         <field name="notify_user" />
                                     </group>
@@ -120,7 +120,7 @@
                                                     <div class="oe_module_desc">
                                                         <div class="float-right"><field name="create_date"/></div>
                                                         <div>
-                                                            <p>
+                                                            <p style="width: 80px;">
                                                                 <field name="question_name" widget="html"/>
                                                             </p>
                                                             <div><p><strong>Response</strong></p></div>

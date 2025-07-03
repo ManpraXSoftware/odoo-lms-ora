@@ -408,7 +408,7 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row d-flex mb-2">
                     <div class="d-flex align-content-start"  style="margin-top:11px;">
-                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;">
+                        <span style="display: flex; color: black; font-size: 15px; margin-right: 8px;white-space: nowrap;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
                         </span>
                         <div class="question_text ml-2" style="font-size: 15px; flex-direction: column; display: inline-flex;" t-out="prompt['question']"/>

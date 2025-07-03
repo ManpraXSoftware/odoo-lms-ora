@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, fields, api, tools
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 import re
 
 class Slide(models.Model):
@@ -29,6 +29,12 @@ class Slide(models.Model):
         default=True,
         help="Send email/internal notifications to the submitting user."
     )
+
+    @api.constrains('prompt_ids', 'rubric_ids')
+    def _check_rubric_if_prompt(self):
+        for record in self:
+            if record.prompt_ids and not record.rubric_ids:
+                raise ValidationError("You must add Rubrics if Prompts are defined.")
 
     def _get_user_responses(self):
         for rec in self:
@@ -169,7 +175,7 @@ class ORA_Rubric(models.Model):
     _rec_name = 'criterian_name'
     _description = 'Open Response Rubric'
 
-    name = fields.Text("Description", required=True, translate=True)
+    name = fields.Text("Description", translate=True)
     slide_id = fields.Many2one('slide.slide')
     criterian_name = fields.Char("Criterian Name", required=True, translate=True)
     criterian_ids = fields.One2many('rubric.criterian', "rubric_id", "Options")
@@ -181,7 +187,7 @@ class RubricCriterian(models.Model):
 
     rubric_id = fields.Many2one('open.response.rubric')
     name = fields.Char("Option", required=True, translate=True)
-    option_desc = fields.Text("Option Description", required=True, translate=True)
+    option_desc = fields.Text("Option Description", translate=True)
     option_points = fields.Integer("Points", required=True)
 
 
