@@ -7,6 +7,7 @@
     'sequence': 10,
     'version': '2.8',
     'website': 'https://www.manprax.com',
+    'icon': '/website_ora_elearning/static/description/icon2.png',
     'author': 'ManpraX Software LLP',
     'depends': ['website_slides'],
     'data': [
