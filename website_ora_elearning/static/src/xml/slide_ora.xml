@@ -169,6 +169,7 @@
                                     </button>
                                     <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" style="float:right;margin-bottom: 10px;" name="submit" value="submit" type="button">
                                         <span>Submit</span>
+                                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                                     </button>
                                 </div>
                             </form>

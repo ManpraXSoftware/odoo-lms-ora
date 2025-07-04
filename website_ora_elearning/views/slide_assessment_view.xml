@@ -95,7 +95,7 @@
                                 <field name="slide_id" readonly="1"/>
                                 <field name="channel_id" readonly="1"/>
                                 <field name="user_id" readonly="1"/>
-                                <field name="staff_id" readonly="state in ('assessed', 'inactive')"/>
+                                <field name="staff_id" readonly="1"/>
                             </group>
                             <group>
                                 <field name="create_date" readonly="1"/>
@@ -143,7 +143,7 @@
                                 </field>
                             </page>
                             <page name="rubric" string="Rubric">
-                                <field name="slide_rubric_staff_line" readonly="state in ('assessed', 'inactive')">
+                                <field name="slide_rubric_staff_line" readonly="1">
                                     <list string="Rubric">
                                         <field name="assess_type"/>
                                         <field name="user_id"/>

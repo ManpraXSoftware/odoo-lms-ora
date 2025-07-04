@@ -238,6 +238,16 @@
         },
 
         _submitOra: function (ev) {
+            ev.preventDefault();
+
+            var $btn = $(ev.currentTarget);
+            var $spinner = $btn.find('.spinner-border');
+            var $text = $btn.find('.button-text');
+
+            // Disable the button and show spinner
+            $btn.prop('disabled', true);
+            $spinner.removeClass('d-none');
+            $text.addClass('d-none');
             var responseData = []
             $('.o_wslides_ora_answer_info').each(function () {
                 var response_div_id = `response_div_${this.id}`;
@@ -275,7 +285,12 @@
                 });
                     // window.location.reload();
                 }
-            });
+                }).always(function () {
+                    // Re-enable the button and hide spinner
+                    $btn.prop('disabled', false);
+                    $spinner.addClass('d-none');
+                    $text.removeClass('d-none');
+                });
         },
     });
     /**
