@@ -5,9 +5,8 @@
     'category': 'Website/eLearning',
     'summary': 'Manage and publish an eLearning platform',
     'sequence': 10,
-    'version': '2.8',
+    'version': '2.9',
     'website': 'https://www.manprax.com',
-    'icon': '/website_ora_elearning/static/description/icon2.png',
     'author': 'ManpraX Software LLP',
     'depends': ['website_slides'],
     'data': [
