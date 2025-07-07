@@ -428,7 +428,7 @@ class WebsiteSlidesORA(WebsiteSlides):
         if template:
             template.sudo().with_context(
                 user_response_id=response.id,
-                user_email=response.staff_id.email_formatted,
+                user_email=response.staff_id.sudo().email_formatted,
                 slide_name=slide.name,
                 peer_emails=peer_email_str,
                 url=url,

@@ -270,6 +270,7 @@
                 }
             });        
             data.push({ name: ev.currentTarget.name, value: ev.currentTarget.value });
+            var currentValue = ev.currentTarget.value;
             ev.preventDefault();
             var self = this;
             $.ajax({
@@ -277,16 +278,13 @@
                 url: "/ora/response/save/",
                 data: data,
                 success: function (data) {
+                    console.log(currentValue);
                     self._renderSlide();
-                    self.trigger_up('slide_completed', {
-                        slideId: self._slideValue.id,
-                        channelCompletion: 100,
-                        completed: true,
-                });
-                    // window.location.reload();
+                    if (currentValue === 'submit') {
+                        self.trigger_up('slide_mark_completed', self._slideValue);
+                }
                 }
                 }).always(function () {
-                    // Re-enable the button and hide spinner
                     $btn.prop('disabled', false);
                     $spinner.addClass('d-none');
                     $text.removeClass('d-none');
