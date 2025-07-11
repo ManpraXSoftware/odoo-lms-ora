@@ -231,11 +231,12 @@
                                                     t-att-data-content="bio_popover_data">
                                                         <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                             <img t-attf-class="rounded-circle o_forum_avatar #{not display_info and 'shadow'}"
-                                                            t-att-src="website.image_url(response.staff_id, 'image_1920', '40x40')" alt="Avatar"/>
+                                                            t-att-src="website.image_url(response.staff_id, 'image_1920', '40x40')" alt="Avatar" style="margin-left:12px;"/>
                                                         </div>
                                                 </div>
+                                                <hr />
                                                 <div class="col">
-                                                    <t t-out="response.feedback"/>
+                                                    Response: <t t-out="response.feedback"/>
                                                 </div>
                                             </div>
                                             <t t-if="response.can_resubmit">
@@ -478,7 +479,7 @@
                 t-att-data-question-id="prompt['id']" t-att-data-title="prompt['question']">
                 <div class="row mb-2">
                     <div class="col-12 d-flex">
-                        <div style="font-size: 15px; font-weight: 500; color: black; margin-right: 8px;">
+                        <div style="font-size: 15px; font-weight: 500; color: black; margin-right: 8px; white-space: nowrap;">
                             Question <t t-out="prompt['sequence'] + 1"/>:
                         </div>
                         <div style="font-size: 15px; color: black;" t-out="prompt['question']"/>

@@ -22,7 +22,7 @@
                     </t>
                 </ul>
                 <div class="tab-content">
-                    <div id="ora_assessment" role="tabpanel" class="o_wslides_js_ora_container tab-pane fade show active" t-att-data-slide-id="widget.slide.id" name="slide" t-att-value="widget.slide.id">
+                    <div id="ora_assessment" role="tabpanel" class="o_wslides_js_ora_container tab-pane fade show active" t-att-data-slide-id="widget.slide.id" name="slide" t-att-value="widget.slide.id" style="background-color: #fcfcfd;">
                         <t t-if="widget.total_responses">
                             <t t-foreach="widget.total_responses" t-as="response" t-key="response">
                                 <t t-if="response.state == 'inactive' || response.state == 'submitted' || response.state == 'assessed'">
@@ -87,11 +87,12 @@
                                             </div>
                                         </t>
                                         <t t-if="response.feedback">
+                                            <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
                                             <div class="o_wslides_quiz_answer_info list-group-item list-group-item-light">
                                                 <t t-set="bio_popover_data">
-                                                    <div class="d-flex o_wforum_bio_popover_wrap">
-                                                        <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="feedback_user_image_url" alt="Avatar"
-                                                        style="height:75px;width75px;"/>
+                                                    <div class="d-flex o_wforum_bio_popover_wrap" style="margin-top: 9px;">
+                                                        <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="response.feedback_user_image_url" alt="Avatar"
+                                                        style="height:75px;width75px;margin-left:13px;"/>
                                                         <div>
                                                             <h5 class="o_wforum_bio_popover_name mb-0" t-esc="response.staff_name"/>
                                                             <span class="o_wforum_bio_popover_info" t-esc="response.staff_name"/>
@@ -100,14 +101,14 @@
                                                 </t>
                                                 <div class="row">
                                                     <div t-attf-class="o_wforum_author_box d-inline-flex #{display_info and 'o_show_info'} #{compact and 'o_compact align-items-center'} #{bio_popover_data and 'o_wforum_bio_popover'}"
-                                                        t-att-data-content="bio_popover_data">
+                                                        t-att-data-content="bio_popover_data" style="margin-top: 9px;">
                                                             <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                                 <img t-attf-class="rounded-circle o_forum_avatar shadow"
-                                                                t-att-src="feedback_user_image_url" alt="Avatar" style="height:40px;width:40px;"/>
+                                                                t-att-src="response.feedback_user_image_url" alt="Avatar" style="height:40px;width:40px;margin-left:14px;"/>
                                                             </div>
                                                     </div>
-                                                    <div class="col">
-                                                        <t t-out="response.feedback"/>
+                                                    <div class="col" style="margin-left: 60px; margin-right: 20px;">
+                                                        <strong>Feedback: </strong><t t-out="response.feedback"/>   
                                                     </div>
                                                 </div>
                                                 <t t-if="response.can_resubmit and response.state == 'submitted'">
@@ -117,14 +118,14 @@
                                                         <input type="hidden" name="response_id" t-att-value="response.id"/>
                                                         <div>
                                                             <button class="o_wslides_js_lesson_ora_submit btn btn-primary o_slide_submit_btn" id="submit_response_fresh" type="submit"
-                                                                style="margin-top: 10px;" name="submit" value="resubmit_fresh">
+                                                                style="margin-top: 25px;margin-bottom:22px;margin-left:60px" name="submit" value="resubmit_fresh">
                                                                 <span>Resubmit Fresh</span>
                                                             </button>
                                                             <button class="o_wslides_js_lesson_ora_submit btn btn-primary o_slide_submit_btn" id="submit_response_copy" type="submit"
-                                                                style="margin-right:10px;margin-top: 10px;" name="submit" value="resubmit_copy">
+                                                                style="margin-right:10px;margin-top: 25px;margin-left:10px;margin-bottom:22px;" name="submit" value="resubmit_copy">
                                                                 <span>Resubmit Copy</span>
                                                             </button>
-                                                            <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="margin-right:10px;margin-top: 10px;">
+                                                            <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="margin-right:25px;margin-top: 25px;margin-bottom:22px;">
                                                                 Continue <i class="fa fa-chevron-right ms-1"/>
                                                             </button>
                                                         </div>
@@ -135,7 +136,7 @@
                                     </div>
                                 </t>
                                 <t t-if="response.state == 'active'">
-                                    <form id="ora_form" role="form" enctype="multipart/form-data" style="margin-right:11px;margin-left: 5px;" action="#">
+                                    <form id="ora_form" role="form" enctype="multipart/form-data" style="margin-right:11px;margin-left: 5px;background-color: #fcfcfd" action="#">
                                         <input type="hidden" id="response_id" t-att-value="response.id"/>
                                         <input type="hidden" name="csrf_token" t-att-value="widget.csrf_token"/>
                                         <div>
@@ -158,7 +159,7 @@
                         <t t-if="(! widget.hasOwnProperty('total_responses') || widget.total_responses.length == 0) &amp;&amp; widget.slide_prompts">
                             <form id="ora_form" role="form" enctype="multipart/form-data" action="#" style="margin-right:11px;margin-left: 5px;">
                                 <input type="hidden" name="csrf_token" t-att-value="widget.csrf_token"/>
-                                <div>
+                                <div style="background-color: #fcfcfd">
                                     <t t-if="widget.slide_prompts">
                                         <t t-call="lesson_active_response_prompts"/>
                                     </t>
@@ -355,14 +356,14 @@
         <div t-attf-class="o_wslides_js_lesson_quiz_question card-body #{(widget.slide.is_member) and ' ' or  ' disabled'}"
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-top: 15px;margin-left: 7px;">
             <div class="row mb-2">
-                <div style="display:inline-flex;">
+                <div style="display:inline-flex;margin-left: 60px;">
                     <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px; white-space: nowrap;">
                         Question <t t-out="prompt['sequence'] + 1"/>:
                     </span>
-                    <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;" t-out="prompt['question']"/>
+                    <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;margin-right: 74px" t-out="prompt['question']"/>
                 </div>
             </div>
-            <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id">
+            <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id" style="margin-left: 60px; margin-right: 10px;">
                 <t t-if="response">
                     <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
                         <t t-if="user_input.prompt_id == prompt.id">
@@ -412,7 +413,7 @@
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-left: 15px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
-                    <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px;">
+                    <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px; white-space: nowrap;">
                         Question <t t-out="prompt['sequence'] + 1"/>:
                     </span>
                     <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;" t-out="prompt['question']"/>

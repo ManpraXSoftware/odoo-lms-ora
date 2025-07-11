@@ -103,7 +103,7 @@
                     }
                     if (data.slide.hasNext && data.slide.next_slide_url && data.slide.ispro) {
                         var slide = $('.o_wslides_fs_sidebar_list_item.active');
-                        var $slides = this.$('.o_wslides_fs_sidebar_list_item');
+                        var $slides = $('.o_wslides_fs_sidebar_list_item');
                         var slideListdata = [];
                         var slideList = []
                         $slides.each(function () {
@@ -126,7 +126,7 @@
                         else if ((slide.data().category != 'quiz' && slide.data().hasQuestion) || slide.data().hasOra) {
                             for (let [i, v] of slideList.entries()) {
                                 if (v[0].classList.contains('active')) {
-                                    index = i + 1;
+                                    index = i;
                                 }
                             }
                         }
@@ -134,15 +134,16 @@
                             index = index - 1
                         }
                         var next_slide = slide_list_data[index + 1];
-                        if (next_slide === self.get('slide')) {
-                            next_slide = slide_list_data[index + 2];
+                        if (next_slide && self.slide && next_slide.id === self.slide.id) {
+                            next_slide = slide_list_data[index + 1];
                         }
                         next_slide['canAccess'] = 'True';
                         var next_slide_list = slideList[index + 1]
-                        if (next_slide_list === self.get('slide')) {
-                            next_slide_list = slide_list_data[index + 2];
+                        if (next_slide && self.slide && next_slide.id === self.slide.id) {
+                            next_slide_list = slide_list_data[index + 1];
                         }
                         var next_div = next_slide_list.find('.o_wslides_fs_slide_name');
+                        next_slide['isSequential'] = false;
                         self.slides.push(next_slide);
                         slide.removeClass('active');
                         $('.o_sidebar_link').attr("href", '#');
@@ -151,7 +152,10 @@
                         next_slide_list.addClass('active');
                         next_slide_list.removeClass('disabled')
                         next_slide_list.removeClass('text-600')
+                        next_slide_list.removeClass('is_sequential');
+                        next_slide_list.find('.d-block.disabled').removeClass('disabled');
                         next_div.removeClass('text-600');
+                        next_div.removeClass('is_sequential');
                         if (slide.data()['hasQuestion'] || slide.data()['isQuiz'] || slide.data()['hasOra']) {
                             var next_quiz = slide.find('.o_wslides_fs_sidebar_list_item a');
                             next_quiz.attr("href", '#');
@@ -160,11 +164,7 @@
                             next_mini.attr("href", '#');
                             next_mini.removeClass('text-600');
                         }
-                        self.sidebar.set('slideEntry', {
-                            id: next_slide.id,
-                            isQuiz: next_slide.isQuiz || false
-                        });
-                        // }
+                        self._updateSlideValue(next_slide);
                     }
                 });
             }
@@ -185,6 +185,7 @@
                     }
                     if (data.total_responses) {
                         for (let i = 0; i < data.total_responses.length; i++) {
+                            data.total_responses[i].feedback = markup(data.total_responses[i].feedback)
                             for (let j = 0; j < (data.total_responses[i].user_response_line).length; j++) {
                                 data.total_responses[i].user_response_line[j].value_richtext_box = markup(data.total_responses[i].user_response_line[j].value_richtext_box)
                             }

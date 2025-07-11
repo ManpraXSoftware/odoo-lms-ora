@@ -184,8 +184,8 @@
                             <page name="feedback" string="Feedback">
                                 <group>
                                     <field name="can_resubmit" readonly="state in ('assessed', 'inactive')"/>
+                                    <field name="feedback" readonly="state in ('assessed', 'inactive')" widget="html"/>
                                 </group>
-                                <field name="feedback" readonly="state in ('assessed', 'inactive')" widget="html"/>
                             </page>
                         </notebook>
                     </sheet>

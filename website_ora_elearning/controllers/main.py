@@ -316,7 +316,7 @@ class WebsiteSlidesORA(WebsiteSlides):
             'peer_assessment': slide.peer_assessment,
             'completed': (request.env['slide.slide.partner'].sudo().search([('slide_id', '=', slide.id),('partner_id', '=', request.env.user.partner_id.id)])).completed,
             'hasNext' : next_slide if next_slide else None,
-            'ispro' : 1 if 'is_sequential' in request.env['slide.channel']._fields else None,
+            'ispro' : True if 'is_sequential' in request.env['slide.channel']._fields else None,
             'next_slide_url': '/slides/slide/%s?fullscreen=1' % request.env['ir.http']._slug(next_slide) if next_slide else None,
             'user': request.env.user.id,
             'rubric_ids': [{
