@@ -6,7 +6,7 @@
                 display: inline;
             }
         </style>
-            <div class="o_wslides_fs_quiz_container o_wslides_wrap h-100 w-100 overflow-auto pb-5 o_user_response" style="background-color: rgb(236 236 236)">
+            <div class="o_wslides_fs_quiz_container o_wslides_wrap w-100 o_user_response" style="background-color: rgb(236 236 236);overflow-x:hidden;">
                 <ul class="nav nav-tabs o_wslides_lesson_nav" role="tablist">
                     <li class="nav-item">
                         <a href="#ora_assessment" aria-controls="ora_assessment" data-oe-model="slide.slide" class="nav-link active" role="tab" data-bs-toggle="tab">
@@ -22,7 +22,7 @@
                     </t>
                 </ul>
                 <div class="tab-content">
-                    <div id="ora_assessment" role="tabpanel" class="o_wslides_js_ora_container tab-pane fade show active" t-att-data-slide-id="widget.slide.id" name="slide" t-att-value="widget.slide.id">
+                    <div id="ora_assessment" role="tabpanel" class="o_wslides_js_ora_container tab-pane fade show active" t-att-data-slide-id="widget.slide.id" name="slide" t-att-value="widget.slide.id" style="background-color: #fcfcfd;">
                         <t t-if="widget.total_responses">
                             <t t-foreach="widget.total_responses" t-as="response" t-key="response">
                                 <t t-if="response.state == 'inactive' || response.state == 'submitted' || response.state == 'assessed'">
@@ -39,16 +39,16 @@
                                                 </div>
                                             </t>
                                             <div class="row" style="line-height: 2.3em;">
-                                                <div class="d-flex align-items-start">
+                                                <div class="d-flex align-items-start" style="margin-top: 5px;">
                                                     <div t-attf-class="o_wforum_author_box d-inline-flex o_show_info o_compact align-items-center o_wforum_bio_popover"
                                                     t-att-data-content="bio_popover_data">
                                                         <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                             <img t-attf-class="rounded-circle o_forum_avatar shadow" t-att-src="response.ora_res_user_image_url" alt="Avatar"
-                                                            style="height:40px;width:40px;"/>
+                                                            style="height:40px;width:40px;margin-left:12px;"/>
                                                         </div>
                                                     </div>
                                                     <t t-if="response.state != 'assessed'">
-                                                        <span class="ml-2">Your response has been submitted successfully on
+                                                        <span class="ml-2" style="margin-left: 5px;">Your response has been submitted successfully on
                                                             <t t-esc="response.submitted_date"/>
                                                         </span>
                                                     </t>
@@ -56,8 +56,8 @@
                                                         <span class="ml-2">Your response has been assessed.</span>
                                                     </t>
                                                 </div>
-                                                <div class="ml-auto">
-                                                    <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="float:right;position:relative;">
+                                                <div class="ml-auto" style="padding-bottom: 12px;">
+                                                    <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="float:right;position:relative;margin-top:6px;margin-right:10px;">
                                                         Continue <i class="fa fa-chevron-right ms-1"/>
                                                     </button>
                                                     <button t-attf-id="show_response-{{response.id}}"
@@ -65,7 +65,7 @@
                                                             t-attf-data-bs-target="#collapse_div_{{response.id}}"
                                                             t-attf-aria-controls="collapse_div"
                                                             data-bs-toggle="collapse"
-                                                            t-attf-style="float:right;position:relative;margin-right:10px;"
+                                                            t-attf-style="float:right;position:relative;margin-right:10px;margin-top:6px;"
                                                             type="button">
                                                         <span id='response_button_text'>View Response</span>
                                                     </button>
@@ -87,11 +87,12 @@
                                             </div>
                                         </t>
                                         <t t-if="response.feedback">
+                                            <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
                                             <div class="o_wslides_quiz_answer_info list-group-item list-group-item-light">
                                                 <t t-set="bio_popover_data">
-                                                    <div class="d-flex o_wforum_bio_popover_wrap">
-                                                        <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="feedback_user_image_url" alt="Avatar"
-                                                        style="height:75px;width75px;"/>
+                                                    <div class="d-flex o_wforum_bio_popover_wrap" style="margin-top: 9px;">
+                                                        <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="response.feedback_user_image_url" alt="Avatar"
+                                                        style="height:75px;width75px;margin-left:13px;"/>
                                                         <div>
                                                             <h5 class="o_wforum_bio_popover_name mb-0" t-esc="response.staff_name"/>
                                                             <span class="o_wforum_bio_popover_info" t-esc="response.staff_name"/>
@@ -100,14 +101,14 @@
                                                 </t>
                                                 <div class="row">
                                                     <div t-attf-class="o_wforum_author_box d-inline-flex #{display_info and 'o_show_info'} #{compact and 'o_compact align-items-center'} #{bio_popover_data and 'o_wforum_bio_popover'}"
-                                                        t-att-data-content="bio_popover_data">
+                                                        t-att-data-content="bio_popover_data" style="margin-top: 9px;">
                                                             <div class="o_wforum_author_pic position-relative rounded-circle me-2">
                                                                 <img t-attf-class="rounded-circle o_forum_avatar shadow"
-                                                                t-att-src="feedback_user_image_url" alt="Avatar" style="height:40px;width:40px;"/>
+                                                                t-att-src="response.feedback_user_image_url" alt="Avatar" style="height:40px;width:40px;margin-left:14px;"/>
                                                             </div>
                                                     </div>
-                                                    <div class="col">
-                                                        <t t-out="response.feedback"/>
+                                                    <div class="col" style="margin-left: 60px; margin-right: 20px;">
+                                                        <strong>Feedback: </strong><t t-out="response.feedback"/>   
                                                     </div>
                                                 </div>
                                                 <t t-if="response.can_resubmit and response.state == 'submitted'">
@@ -117,14 +118,14 @@
                                                         <input type="hidden" name="response_id" t-att-value="response.id"/>
                                                         <div>
                                                             <button class="o_wslides_js_lesson_ora_submit btn btn-primary o_slide_submit_btn" id="submit_response_fresh" type="submit"
-                                                                style="margin-top: 10px;" name="submit" value="resubmit_fresh">
+                                                                style="margin-top: 25px;margin-bottom:22px;margin-left:60px" name="submit" value="resubmit_fresh">
                                                                 <span>Resubmit Fresh</span>
                                                             </button>
                                                             <button class="o_wslides_js_lesson_ora_submit btn btn-primary o_slide_submit_btn" id="submit_response_copy" type="submit"
-                                                                style="margin-right:10px;margin-top: 10px;" name="submit" value="resubmit_copy">
+                                                                style="margin-right:10px;margin-top: 25px;margin-left:10px;margin-bottom:22px;" name="submit" value="resubmit_copy">
                                                                 <span>Resubmit Copy</span>
                                                             </button>
-                                                            <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="margin-right:10px;margin-top: 10px;">
+                                                            <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="margin-right:25px;margin-top: 25px;margin-bottom:22px;">
                                                                 Continue <i class="fa fa-chevron-right ms-1"/>
                                                             </button>
                                                         </div>
@@ -135,7 +136,7 @@
                                     </div>
                                 </t>
                                 <t t-if="response.state == 'active'">
-                                    <form id="ora_form" role="form" enctype="multipart/form-data" action="#">
+                                    <form id="ora_form" role="form" enctype="multipart/form-data" style="margin-right:11px;margin-left: 5px;background-color: #fcfcfd" action="#">
                                         <input type="hidden" id="response_id" t-att-value="response.id"/>
                                         <input type="hidden" name="csrf_token" t-att-value="widget.csrf_token"/>
                                         <div>
@@ -147,7 +148,7 @@
                                             <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" name="submit" value="save" type="button">
                                                 <span>Save Your Progress</span>
                                             </button>
-                                            <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" style="float:right;" name="submit" value="submit" type="button">
+                                            <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary#{(widget.slide.is_member or widget.slide.is_preview) and ' ' or  ' d-none'}" style="float:right;margin-bottom: 10px;" name="submit" value="submit" type="button">
                                                 <span>Submit</span>
                                             </button>
                                         </div>
@@ -156,19 +157,20 @@
                             </t>
                         </t>
                         <t t-if="(! widget.hasOwnProperty('total_responses') || widget.total_responses.length == 0) &amp;&amp; widget.slide_prompts">
-                            <form id="ora_form" role="form" enctype="multipart/form-data" action="#">
+                            <form id="ora_form" role="form" enctype="multipart/form-data" action="#" style="margin-right:11px;margin-left: 5px;">
                                 <input type="hidden" name="csrf_token" t-att-value="widget.csrf_token"/>
-                                <div>
+                                <div style="background-color: #fcfcfd">
                                     <t t-if="widget.slide_prompts">
                                         <t t-call="lesson_active_response_prompts"/>
                                     </t>
                                 </div>
                                 <div t-attf-class="mt-3 card-body#{(widget.slide.is_member) and ' ' or  ' d-none'}">
-                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" name="submit" value="save" type="button">
+                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" name="submit" value="save" type="button" style="margin-left:6px;">
                                         <span>Save Your Progress</span>
                                     </button>
-                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" style="float:right;" name="submit" value="submit" type="button">
+                                    <button t-attf-class="o_wslides_js_lesson_ora_submit btn btn-primary" style="float:right;margin-bottom: 10px;" name="submit" value="submit" type="button">
                                         <span>Submit</span>
+                                        <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                                     </button>
                                 </div>
                             </form>
@@ -181,7 +183,9 @@
                             </div>
                         </t>
                         <t t-if="! widget.peer_responses || (widget.peer_responses  &amp;&amp; widget.peer_responses.length == 0)">
-                            <h2>There is no peer responses to assess.</h2>
+                            <div style="height: 72vh; display: flex; justify-content: center; align-items: center; overflow: hidden;">
+                                <h4 class="text-center">There is no peer responses to assess.</h4>
+                            </div>
                         </t>
                     </div>
                 </div>
@@ -192,11 +196,11 @@
             <t t-set="count" t-value="0"/>
             <t t-foreach="widget.peer_responses" t-as="response" t-key="response">
                 <t t-set="count" t-value="count + 1"/>
-                <div class="mt-3 list-group-item list-group-item-light" style="line-height: 2.5em;">
-                    <span>Learner Response <t t-esc="count"/>
-                        <t t-if="response.submitted_date">assessed on <t t-esc="response.submitted_date"/></t>
+                <div class="mt-3 list-group-item list-group-item-light" style="line-height: 3.2em;">
+                    <span style="margin-left:10px;">Learner Response <t t-esc="count"/>
+                        <t t-if="response.submitted_date"> assessed on <t t-esc="response.submitted_date"/></t>
                     </span>
-                    <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="float:right;position:relative;">
+                    <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="float:right;position:relative;margin-top:6px;margin-right:7px;">
                         Continue <i class="fa fa-chevron-right ms-1"/>
                     </button>
                     <button t-attf-id="show_response-{{response.id}}"
@@ -204,7 +208,7 @@
                             t-attf-data-bs-target="#collapse_div_{{response.id}}"
                             t-attf-aria-controls="collapse_div"
                             data-bs-toggle="collapse"
-                            t-attf-style="float:right;position:relative;"
+                            t-attf-style="float:right;position:relative;margin-top:6px;"
                             type="button">
                         <span id='response_button_text'>View Response</span>
                     </button>
@@ -223,17 +227,18 @@
         </div>
     </t>
     <t t-name="lesson_submitted_response_prompts">
-        <div class="o_wslides_js_lesson_ora" id="lessonORA">
+        <div class="o_wslides_js_lesson_ora" style="background-color: #fcfcfd;padding:10px;" id="lessonORA">
             <t t-foreach="widget.slide_prompts" t-as="prompt" t-key="prompt">
                 <t t-call="lesson_content_quiz_prompt_submitted"/>
             </t>
             <t t-if="response.state == 'in_progress' and response.user_id == widget.slide.user">
-                <h3>Complete the rubric and submit the assessment.</h3>
+                <br />
+                <h5>Complete the rubric and submit the assessment.</h5>
                 <t t-foreach="widget.slide.rubric_ids" t-as="rubric" t-key="rubric">
                     <ul class="list-group">
                         <li class="list-group-item mb-3">
                             <div class="mb-3">
-                                <h4><t t-esc="rubric.criterian_name"/></h4>
+                                <h5><t t-esc="rubric.criterian_name"/></h5>
                                 <span t-esc="rubric.name"/>
                             </div>
                             <div class="o_select_option mb-3 row" style="margin: auto;">
@@ -258,12 +263,12 @@
                 </button>
             </t>
             <t t-if="response.state == 'completed'">
-                <h3 style="text-align: center;">
+                <h4 style="text-align: center;">
                     <span style="font-weight: bold;">Assessment</span>
-                </h3>
+                </h4>
                 <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
                 <div class="tableBox" style="overflow: auto;">
-                    <table class="table-bordered table" style="table-layout: auto;">
+                    <table class="table-bordered table" style="table-layout: auto;line-height: 50px;">
                         <t t-foreach="response.option_ids" t-as="res_rubric" t-key="res_rubric">
                             <tr>
                                 <td style="text-align: center;vertical-align: middle;">
@@ -279,7 +284,9 @@
                                                     <t t-set="points" t-value="'('+res_rubric.criteria_option_point+'points)'"/>
                                                     <span t-esc="points"></span>
                                                     <br/>
-                                                    <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
+                                                    <t t-if="res_rubric.assess_explanation">
+                                                        <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
+                                                    </t>
                                                 </t>
                                             </td>
                                         </t>
@@ -293,18 +300,18 @@
         </div>
     </t>
     <t t-name="lesson_assessed_response_prompts">
-        <div class="o_wslides_js_lesson_ora" id="lessonORA">
+        <div class="o_wslides_js_lesson_ora" style="background-color: #fcfcfd;padding:10px;" id="lessonORA">
             <t t-foreach="widget.slide_prompts" t-as="prompt" t-key="prompt">
                 <t t-call="lesson_content_quiz_prompt_submitted"/>
             </t>
             <t t-foreach="response.slide_rubric_staff_line" t-as="staff_line" t-key="staff_line">
                 <t t-if="staff_line.assess_type == 'staff'">
-                    <h3 class="text-center mt-3">
+                    <h4 class="text-center mt-5">
                         <span style="font-weight: bold;">Assessment</span>
-                    </h3>
+                    </h4>
                     <hr style="height:1px;border-width:0;color:gray;background-color:gray"/>
                     <div class="tableBox" style="overflow-x: auto">
-                        <table class="table-bordered table" style="table-layout: auto;">
+                        <table class="table-bordered table" style="table-layout: auto;line-height: 50px;">
                             <t t-foreach="staff_line.option_ids" t-as="res_rubric" t-key="res_rubric">
                                 <tr>
                                     <td style="text-align: center;vertical-align: middle;">
@@ -315,11 +322,15 @@
                                             <t t-if="res_rubric.id == rubric.id">
                                                 <td t-attf-style="background-color:#{res_rubric.name == option.name and '#d9edf7'};
                                                 overflow-wrap: anywhere;text-align: center;vertical-align: middle;">
-                                                    <span t-esc="option.name"/>
                                                     <t t-if="res_rubric.name == option.name">
-                                                        (<span style="margin-right:2px;" t-esc="res_rubric.criteria_option_point"></span>points)
-                                                        <br/>
-                                                        <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
+                                                        <span>
+                                                            <t t-esc="option.name"/>
+                                                            (<t t-esc="res_rubric.criteria_option_point"/> points)
+                                                        </span>
+                                                        <br />
+                                                        <t t-if="res_rubric.assess_explanation">
+                                                            <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
+                                                        </t>
                                                     </t>
                                                 </td>
                                             </t>
@@ -345,14 +356,14 @@
         <div t-attf-class="o_wslides_js_lesson_quiz_question card-body #{(widget.slide.is_member) and ' ' or  ' disabled'}"
             t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-top: 15px;margin-left: 7px;">
             <div class="row mb-2">
-                <div style="display:inline-flex;">
-                    <small class="text-muted">
-                        <i class="fa fa-quora me-1"></i>
-                    </small>
-                    <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                <div style="display:inline-flex;margin-left: 60px;">
+                    <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px; white-space: nowrap;">
+                        Question <t t-out="prompt['sequence'] + 1"/>:
+                    </span>
+                    <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;margin-right: 74px" t-out="prompt['question']"/>
                 </div>
             </div>
-            <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id">
+            <div class="list-group o_wslides_ora_answer_info" t-att-id="prompt.id" style="margin-left: 60px; margin-right: 10px;">
                 <t t-if="response">
                     <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
                         <t t-if="user_input.prompt_id == prompt.id">
@@ -364,7 +375,7 @@
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
                                 <span class="input-group-text">Your Response</span>
-                                <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}">
+                                <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}" style="background-color: white;">
                                     <textarea class="form-control o_wysiwyg_loader" 
                                         t-att-name="prompt.id" required="required">
                                         <t t-esc="user_input.value_richtext_box"/>
@@ -383,7 +394,7 @@
                     </t>
                     <t t-if="prompt.response_type == 'rich_text'">
                         <span class="input-group-text">Your Response</span>
-                        <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}">
+                        <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}" style="background-color: white;">
                             <textarea class="form-control s_website_form_input o_wysiwyg_loader" t-att-name="prompt.id" required="required"></textarea>
                         </div>
                     </t>
@@ -399,13 +410,13 @@
     </t>
     <t t-name="lesson_content_quiz_prompt_submitted">
         <div t-attf-class="o_wslides_js_lesson_quiz_question card-body #{(widget.slide.is_member) and ' ' or  ' disabled'}"
-            t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question">
+            t-attf-data-question-id="#{prompt.id}" t-att-data-title="prompt.question" style="margin-left: 15px;">
             <div class="row mb-2">
                 <div style="display:inline-flex;">
-                    <small class="text-muted">
-                        <i class="fa fa-quora me-1"></i>
-                    </small>
-                    <div class="question_text ml-2" style="line-height:1.2;flex-direction:column;display:inline-flex;" t-out="prompt['question']"/>
+                    <span style="display: flex; color: black; font-size: 15px; font-weight: 500; margin-right: 8px; white-space: nowrap;">
+                        Question <t t-out="prompt['sequence'] + 1"/>:
+                    </span>
+                    <div class="question_text ml-2" style="flex-direction: column; display: inline-flex; font-size: 15px; color: black;" t-out="prompt['question']"/>
                 </div>
             </div>
             <div class="row mb-2">
@@ -413,20 +424,18 @@
                     <t t-foreach="response.user_response_line" t-as="user_input" t-key="user_imput">
                         <t t-if="user_input.prompt_id == prompt.id">
                             <t t-if="prompt.response_type == 'text'">
-                                <small class="text-muted">
-                                    <i class="fa fa-font me-1"></i>
-                                </small>
-                                <span class="ml-1" style="line-height: 1">
+                                <div style="display: flex; color: black; font-size: 15px; margin-bottom: 5px;">
+                                    <span style="margin-right: 8px;">Answer:</span>
                                     <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
-                                </span>
+                                </div>
+                                <br />
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
-                                <small class="text-muted">
-                                    <i class="fa fa-font me-1"></i>
-                                </small>
-                                <span class="ml-1" style="line-height: 1">
-                                    <span t-out="user_input.value_richtext_box"/>
-                                </span>
+                                <div style="display: flex; color: black; font-size: 15px; margin-bottom: 5px;">
+                                    <span style="margin-right: 8px;">Answer:</span>
+                                    <span style="white-space: break-spaces;" t-out="user_input.value_richtext_box"/>
+                                </div>
+                                <br/>
                             </t>
                         </t>
                     </t>

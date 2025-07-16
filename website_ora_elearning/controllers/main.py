@@ -1,7 +1,12 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import werkzeug
+import werkzeug.utils
+import werkzeug.exceptions
+
 from odoo import _, http
 from odoo.http import request, Response
+from odoo.exceptions import UserError
 from datetime import datetime
 from markupsafe import Markup
 from odoo.addons.website_slides.controllers.main import WebsiteSlides
@@ -11,44 +16,164 @@ class WebsiteSlidesORA(WebsiteSlides):
 
     @http.route('/ora/response/save/', type='http', auth="user", website=True)
     def save_response(self, **kwargs):
+        slide_id = int(kwargs.get('slide_id'))
+        submit_action = kwargs.get('submit')
+        slide = request.env['slide.slide'].sudo().browse(slide_id)
         user_response = self._get_access_data(kwargs)
-        slide = request.env['slide.slide'].sudo().browse(int(kwargs.get('slide_id')))
-        if kwargs.get('submit') == 'save':
+
+        if submit_action == 'save':
             self.add_answers(kwargs, user_response)
-        if kwargs.get('submit') == 'resubmit_fresh':
+
+        elif submit_action == 'resubmit_fresh':
             self._get_access_data(kwargs, resubmit=True)
             user_response.state = 'inactive'
-        if kwargs.get('submit') == 'resubmit_copy':
+
+        elif submit_action == 'resubmit_copy':
             resubmit_copy_response = self._get_access_data(kwargs, resubmit=True)
             self.add_answers(kwargs, resubmit_copy_response)
             user_response.state = 'inactive'
-        if kwargs.get('submit') == 'submit':
+
+        elif submit_action == 'submit':
             if len(user_response) > 1:
-                user_response = user_response[-1]    
-            user_response.state = 'submitted'
-            user_response.submitted_date = datetime.now()
+                user_response = user_response[-1]
+
+            user_response.write({
+                'state': 'submitted',
+                'submitted_date': datetime.now()
+            })
+
             self.add_answers(kwargs, user_response)
+            partner = request.env.user.partner_id
+            request.env['slide.slide.partner'].sudo().search([
+                ('slide_id', '=', slide.id),
+                ('partner_id', '=', partner.id)
+            ], limit=1).write({'completed': True})
+            # if slide_partner and not slide_partner.completed:
+            #     slide_partner.write({'completed': True})
+            # else:
+            #     slide_partner.write({'completed': False})
             if slide.peer_assessment:
-                peer_limit = slide.peer_limit
-                enrolled_users = slide.channel_id.partner_ids.filtered(lambda l: l.id != request.env.user.partner_id.id)
-                if peer_limit <= len(enrolled_users):
-                    peer_limit = peer_limit
-                else:
-                    peer_limit = len(enrolled_users)
-                for _ in range(peer_limit):
-                    peer_user = slide._get_peer_user(user_response)
-                    if peer_user:
-                        request.env['open.response.rubric.staff'].create({
-                            'assess_type': 'peer',
-                            'user_id': peer_user.id,
-                            'state': 'in_progress',
-                            'response_id': user_response.id
-                        })
-            user_response.message_post(
-                body='This response has been submitted!', message_type='notification',
-                subtype_xmlid='mail.mt_comment', author_id=request.env.user.partner_id.id,
-                partner_ids=[user_response.staff_id.partner_id.id])
+                peer_users = self._assign_peer_review_users(slide, user_response)
+                if slide.notify_peer:
+                    self._notify_peer_users(slide, user_response, peer_users)
+            else:
+                if slide.notify_staff:
+                    self._notify_staff(slide, user_response)
+
         return request.redirect('/slides/slide/%s' % request.env['ir.http']._slug(slide))
+
+    def _assign_peer_review_users(self, slide, user_response):
+        # create a course with admin
+        # create two portal user and then fill course from them and check which is coming in peer user
+        # it should not be from author of user
+        author_partner = slide.channel_id.user_id.partner_id
+        enrolled_users = slide.channel_id.partner_ids.filtered(
+            lambda p: p.id != request.env.user.partner_id.id and p.id != author_partner.id
+        )
+        peer_limit = min(slide.peer_limit, len(enrolled_users))
+        peer_users = []
+
+        for _ in range(peer_limit):
+            peer_user = slide._get_peer_user(user_response)
+            if peer_user and peer_user.id != author_partner.id and peer_user not in peer_users:
+                peer_users.append(peer_user)
+                request.env['open.response.rubric.staff'].create({
+                    'assess_type': 'peer',
+                    'user_id': peer_user.id,
+                    'state': 'in_progress',
+                    'response_id': user_response.id
+                })
+
+        return peer_users
+
+    def _notify_peer_users(self, slide, user_response, peer_users):
+        for peer in peer_users:
+            msg = request.env['mail.message'].create({
+                'model': 'res.partner',
+                'res_id': peer.partner_id.id,
+                'message_type': 'comment',
+                'subtype_id': request.env.ref('mail.mt_comment').id,
+                'author_id': request.env.user.partner_id.id,
+                'body': f"""
+                    <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                    <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
+                    <div style="padding: 16px 8px; text-align: center;">
+                        <a href="{slide.website_url}?fullscreen=1#"
+                        style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                            View ORA Response
+                        </a>
+                    </div>
+                    <p>Thank you for your valuable time and feedback.</p>
+                    <br/>
+                    <p>Best regards,<br/>
+                    {user_response.user_id.partner_id.name or ''}</p>
+                    """,
+            })
+            request.env['mail.notification'].create({
+                'author_id': msg.author_id.id,
+                'mail_message_id': msg.id,
+                'res_partner_id': peer.partner_id.id,
+                'notification_type': 'inbox',
+                'notification_status': 'sent',
+            })
+            template = request.env.ref('website_ora_elearning.email_template_peer_review_submitted')
+            if template:
+                template.sudo().with_context(
+                    user_response_id=user_response.id,
+                    peer_user_email=peer.partner_id.email_formatted,
+                    peer_user_name=peer.partner_id.name,
+                    user_id=request.env.user.id,
+                    user_name=request.env.user.name,
+                    slide_name=slide.name,
+                    slide_url=slide.website_url + '?fullscreen=1#',
+                    company_email = request.env.company.email_formatted
+                ).send_mail(peer.id, force_send=True)
+
+    def _notify_staff(self, slide, user_response):
+        staff = user_response.staff_id
+        if not staff:
+            raise UserError(_('No peer users and staff are available for assessment. Please try again later.'))
+
+        msg = request.env['mail.message'].create({
+            'model': 'res.partner',
+            'res_id': slide.user_id.partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': request.env.ref('mail.mt_comment').id,
+            'author_id': request.env.user.partner_id.id,
+            'body': f"""
+                <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
+                <div style="padding: 16px 8px; text-align: center;">
+                    <a href="{slide.website_url}?fullscreen=1#"
+                    style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                        View ORA Response
+                    </a>
+                </div>
+                <p>Thank you for your valuable time and feedback.</p>
+                <br/>
+                <p>Best regards,<br/>
+                {user_response.user_id.partner_id.name or ''}</p>
+                """,
+        })
+        request.env['mail.notification'].create({
+            'author_id': msg.author_id.id,
+            'mail_message_id': msg.id,
+            'res_partner_id': slide.user_id.partner_id.id,
+            'notification_type': 'inbox',
+            'notification_status': 'sent',
+        })
+        template = request.env.ref('website_ora_elearning.email_template_staff_review_submitted')
+        if template:
+            template.sudo().with_context(
+                user_response_id=user_response.id,
+                staff_name = user_response.staff_id.name,
+                staff_email = user_response.staff_id.partner_id.email,
+                user_id=request.env.user.id,
+                user_name=request.env.user.name,
+                slide_name=slide.name,
+                slide_url=slide.website_url + '?fullscreen=1#',
+                company_email = request.env.company.email_formatted
+            ).send_mail(staff.id, force_send=True)
 
     def _get_access_data(self, post, resubmit=False):
         user = request.env.user
@@ -70,8 +195,6 @@ class WebsiteSlidesORA(WebsiteSlides):
                             line.value_text_box = oline.value_text_box
                         elif line.response_type == 'rich_text':
                             line.value_richtext_box = Markup(oline.value_richtext_box)
-                            # query = ("update open_response_user_line set value_richtext_box='%s' where id=%s") % (oline.value_richtext_box, oline.id)
-                            # request.cr.execute(query)
         else:
             for line in response.user_response_line:
                 if line.response_type == 'text':
@@ -108,9 +231,6 @@ class WebsiteSlidesORA(WebsiteSlides):
             values['total_responses'] = total_responses
             values['assessed_response'] = assessed_response
             values['rubric_ids'] = slide.rubric_ids
-            # if assessed_response:
-            #     values['channel_progress'][slide.id]['quiz_karma_gain'] += assessed_response.xp_points
-            #     values['channel_progress'][slide.id]['quiz_karma_won'] += assessed_response.xp_points
             for response in total_responses:
                 if response.feedback == '<p><br></p>':
                     response.feedback = False
@@ -175,6 +295,18 @@ class WebsiteSlidesORA(WebsiteSlides):
                     }))
         return values
 
+    
+    def _slide_mark_completed(self, slide):
+        slide_partner = request.env['slide.slide.partner'].sudo().search([
+                ('slide_id', '=', slide.id),
+                ('partner_id', '=', request.env.user.partner_id.id)
+            ], limit=1)
+        if slide.prompt_ids and slide_partner and not slide_partner.completed:
+            return False
+        else:
+            slide.action_mark_completed()
+            return super(WebsiteSlidesORA, self)._slide_mark_completed(slide)
+    
     def _get_slide_values(self, slide):
         next_slide = slide.channel_id.slide_content_ids[((slide.channel_id.slide_content_ids.ids).index(slide.id))+1] if ((slide.channel_id.slide_content_ids.ids).index(slide.id)) < len(slide.channel_id.slide_content_ids.ids) - 1 else None
         return {
@@ -184,7 +316,7 @@ class WebsiteSlidesORA(WebsiteSlides):
             'peer_assessment': slide.peer_assessment,
             'completed': (request.env['slide.slide.partner'].sudo().search([('slide_id', '=', slide.id),('partner_id', '=', request.env.user.partner_id.id)])).completed,
             'hasNext' : next_slide if next_slide else None,
-            'ispro' : 1 if 'is_sequential' in request.env['slide.channel']._fields else None,
+            'ispro' : True if 'is_sequential' in request.env['slide.channel']._fields else None,
             'next_slide_url': '/slides/slide/%s?fullscreen=1' % request.env['ir.http']._slug(next_slide) if next_slide else None,
             'user': request.env.user.id,
             'rubric_ids': [{
@@ -251,29 +383,98 @@ class WebsiteSlidesORA(WebsiteSlides):
     @http.route('/submit/peer/response', type='http', auth="user", website=True)
     def submit_peer_response(self, **kwargs):
         slide = request.env['slide.slide'].sudo().browse(int(kwargs.get('slide_id')))
-        if kwargs.get('response_id'):
-            response_id = request.env['ora.response'].browse(int(kwargs.get('response_id')))
-            for line in response_id.slide_rubric_staff_line:
-                if line.user_id == request.env.user and line.assess_type == 'peer':
-                    values = []
-                    for criteria in response_id.slide_id.rubric_ids:
-                        opt_key = ''
-                        exp_key = ''
-                        for option_id in criteria.criterian_ids:
-                            opt_key = 'options_%s_%s' % (response_id.id, criteria.id)
-                            exp_key = 'exp_%s_%s' % (response_id.id, criteria.id)
-                            if opt_key in kwargs and exp_key in kwargs:
-                                break
-                        option_id = kwargs.get(opt_key)
-                        values.append((0, 0, {
-                            'criteria_id': criteria.id,
-                            'option_id': int(option_id) if option_id else False,
-                            'assess_explanation': kwargs.get(exp_key)
-                        }))
-                    line.option_ids = values
-                    line.state = 'completed'
-                    line.submitted_date = datetime.now()
+        response_id = int(kwargs.get('response_id'))
+        response = request.env['ora.response'].browse(response_id)
+
+        self._submit_peer_review(response, request.env.user, kwargs)
+
+        if self._all_peers_completed(response) and slide.notify_staff:
+            self._notify_staff_on_peer_completion(response, slide)
+
         return request.redirect('/slides/slide/%s' % request.env['ir.http']._slug(slide))
+
+    def _submit_peer_review(self, response, user, kwargs):
+        for line in response.slide_rubric_staff_line:
+            if line.user_id == user and line.assess_type == 'peer':
+                values = []
+                for criteria in response.slide_id.rubric_ids:
+                    opt_key = f'options_{response.id}_{criteria.id}'
+                    exp_key = f'exp_{response.id}_{criteria.id}'
+                    option_id = kwargs.get(opt_key)
+                    values.append((0, 0, {
+                        'criteria_id': criteria.id,
+                        'option_id': int(option_id) if option_id else False,
+                        'assess_explanation': kwargs.get(exp_key)
+                    }))
+                line.option_ids = values
+                line.state = 'completed'
+                line.submitted_date = datetime.now()
+
+    def _all_peers_completed(self, response):
+        peer_lines = response.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer')
+        return all(l.state == 'completed' for l in peer_lines)
+
+    def _notify_staff_on_peer_completion(self, response, slide):
+        peer_lines = response.slide_rubric_staff_line.filtered(lambda l: l.assess_type == 'peer' and l.state == 'completed')
+        peer_names = [l.user_id.name for l in peer_lines]
+        peer_emails = [l.user_id.email for l in peer_lines]
+
+        peer_email_str = ", ".join(peer_emails) if peer_emails else "No peers found"
+        base_url = request.env['ir.config_parameter'].sudo().get_param('web.base.url')
+        action = request.env.ref('website_ora_elearning.action_ora_response')
+        url = f"{base_url}/odoo/action-{action.id}/{response.id}"
+
+        template = request.env.ref('website_ora_elearning.mail_template_peer_assessment_completed')
+        if template:
+            template.sudo().with_context(
+                user_response_id=response.id,
+                user_email=response.staff_id.sudo().email_formatted,
+                slide_name=slide.name,
+                peer_emails=peer_email_str,
+                url=url,
+                company_email = request.env.company.email_formatted
+            ).send_mail(response.id, force_send=True)
+
+        peer_name_str = self._format_peer_names(peer_names)
+
+        msg = request.env['mail.message'].create({
+            'model': 'res.partner',
+            'res_id': response.user_id.sudo().partner_id.id,
+            'message_type': 'comment',
+            'subtype_id': request.env.ref('mail.mt_comment').id,
+            'author_id': request.env.user.partner_id.id,
+            'body': f"""
+                <p>Dear {response.user_id.name},</p>
+                <p><strong>{peer_name_str}</strong> {('has' if len(peer_names) == 1 else 'have')} submitted their peer assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
+                <p>We kindly request you to review and evaluate the submission at your earliest convenience.</p>
+                <div style="padding: 16px 8px; text-align: center;">
+                    <a href="{url}" style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+                        View ORA Response
+                    </a>
+                </div>
+                <p>Your feedback is highly valued and contributes significantly to the learner's development.</p>
+                <br/>
+                <p>Best regards,<br/>{peer_name_str}</p>
+            """,
+        })
+
+        request.env['mail.notification'].create({
+            'author_id': msg.author_id.id,
+            'mail_message_id': msg.id,
+            'res_partner_id': response.user_id.sudo().partner_id.id,
+            'notification_type': 'inbox',
+            'notification_status': 'sent',
+        })
+
+    def _format_peer_names(self, names):
+        if not names:
+            return "No peers found"
+        if len(names) == 1:
+            return names[0]
+        elif len(names) == 2:
+            return f"{names[0]} and {names[1]}"
+        else:
+            return f"{', '.join(names[:-1])}, and {names[-1]}"
 
     def _get_channel_progress(self, channel, include_quiz=False):
         result = super(WebsiteSlidesORA, self)._get_channel_progress(channel, include_quiz=include_quiz)

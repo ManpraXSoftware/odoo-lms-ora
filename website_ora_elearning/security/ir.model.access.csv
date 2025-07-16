@@ -20,3 +20,5 @@ access_open_response_rubric_staff_public,open.response.rubric.staff,model_open_r
 access_open_response_rubric_assess_public,open.response.rubric.assess,model_open_response_rubric_assess,base.group_public,1,1,1,0
 access_open_response_user_line_public,open.response.user.line,model_open_response_user_line,base.group_public,1,1,1,0
 access_rubric_criterian_public,rubric.criterian,model_rubric_criterian,base.group_public,1,1,1,0
+access_mark_assessed_wizard_user,mark.assessed.wizard,model_mark_assessed_wizard,base.group_user,1,1,1,1
+access_rubric_assess_line_wizard_user,rubric.assess.line.wizard,model_rubric_assess_line_wizard,base.group_user,1,1,1,1

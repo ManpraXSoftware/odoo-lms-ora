@@ -2,8 +2,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import models, fields, api, tools
-from odoo.exceptions import UserError
-
+from odoo.exceptions import UserError, ValidationError
+import re
+from markupsafe import Markup
+from lxml import html
 
 class Slide(models.Model):
     _inherit = 'slide.slide'
@@ -13,7 +15,28 @@ class Slide(models.Model):
     peer_assessment = fields.Boolean("Peer Assessment")
     peer_limit = fields.Integer("Peer Limit")
     response_ids = fields.Many2many('ora.response', string="Responses", compute="_get_user_responses")
-    response_count = fields.Integer("Responses", compute="_get_user_responses")
+    response_count = fields.Integer("Responses Count", compute="_get_user_responses")
+    notify_peer = fields.Boolean(
+        string='Send Peer Notifications',
+        default=True,
+        help="Send email/internal notifications for peer reviewers."
+    )
+    notify_staff = fields.Boolean(
+        string='Send Staff Notifications',
+        default=True,
+        help="Send email/internal notifications to staff about peer assessment progress."
+    )
+    notify_user = fields.Boolean(
+        string='Send User Notifications',
+        default=True,
+        help="Send email/internal notifications to the submitting user."
+    )
+
+    @api.constrains('prompt_ids', 'rubric_ids')
+    def _check_rubric_if_prompt(self):
+        for record in self:
+            if record.prompt_ids and not record.rubric_ids:
+                raise ValidationError("You must add Rubrics if Prompts are defined.")
 
     def _get_user_responses(self):
         for rec in self:
@@ -84,10 +107,13 @@ class Slide(models.Model):
         :param response: Current response on which we are checking the peers.
         :return: A res.users record or None.
         '''
-        enrolled_users = list(set(self.channel_id.partner_ids.ids) - set(ora_response.user_id.partner_id.ids))
+        current_partner_id = ora_response.user_id.partner_id.id
+        author_partner_id = self.channel_id.user_id.partner_id.id
+        enrolled_partner_ids = self.channel_id.partner_ids.ids
+        eligible_partner_ids = list(set(enrolled_partner_ids) - {current_partner_id, author_partner_id})
         peer_limit = self.peer_limit
         to_allocate_user = {}
-        for partner_id in enrolled_users:
+        for partner_id in eligible_partner_ids:
             rubric_line_ids = self.env['open.response.rubric.staff'].search([
                 ('assess_type', '=', 'peer'),
                 ('user_id.partner_id', '=', partner_id),
@@ -106,14 +132,39 @@ class Slide(models.Model):
         if user_ids:
             return self.env['res.users'].search([('partner_id', '=', user_ids[0])], limit=1)
 
+class Channel(models.Model):
+    _inherit = 'slide.channel'
+    
+    response_count = fields.Integer("Responses Count", compute="_get_user_responses")
+    response_ids = fields.Many2many('ora.response', string="Responses", compute="_get_user_responses")
+    prompt_ids = fields.One2many('open.response.prompt', 'channel_id')
+
+    def _get_user_responses(self):
+        for rec in self:
+            rec.response_ids = [(5, 0, 0)]  # clear m2m
+            rec.response_count = 0
+            all_prompt_ids = rec.slide_ids.mapped('prompt_ids').ids
+            if all_prompt_ids:
+                user_response_ids = self.env['ora.response'].search([
+                    ('user_response_line.prompt_id', 'in', all_prompt_ids)
+                ])
+                rec.response_ids = [(6, 0, user_response_ids.ids)]
+                rec.response_count = len(user_response_ids)
+                    
+    def action_open_responses(self):
+        action = self.env['ir.actions.act_window']._for_xml_id('website_ora_elearning.action_ora_response')
+        action['domain'] = [('id', 'in', self.response_ids.ids)]
+        return action
 
 class ORA_Prompt(models.Model):
     _name = 'open.response.prompt'
     _order = "sequence"
+    _description = 'Open Response Prompt'
 
     sequence = fields.Integer("Sequence")
     name = fields.Text("Description", translate=True)
     slide_id = fields.Many2one('slide.slide')
+    channel_id = fields.Many2one('slide.channel')
     question_name = fields.Html("Question", required=True, translate=True)
     response_type = fields.Selection([
         ('text', 'Text'),
@@ -124,8 +175,9 @@ class ORA_Prompt(models.Model):
 class ORA_Rubric(models.Model):
     _name = 'open.response.rubric'
     _rec_name = 'criterian_name'
+    _description = 'Open Response Rubric'
 
-    name = fields.Text("Description", required=True, translate=True)
+    name = fields.Text("Description", translate=True)
     slide_id = fields.Many2one('slide.slide')
     criterian_name = fields.Char("Criterian Name", required=True, translate=True)
     criterian_ids = fields.One2many('rubric.criterian', "rubric_id", "Options")
@@ -133,10 +185,11 @@ class ORA_Rubric(models.Model):
 
 class RubricCriterian(models.Model):
     _name = 'rubric.criterian'
+    _description = 'Rubric Criterian'
 
     rubric_id = fields.Many2one('open.response.rubric')
     name = fields.Char("Option", required=True, translate=True)
-    option_desc = fields.Text("Option Description", required=True, translate=True)
+    option_desc = fields.Text("Option Description", translate=True)
     option_points = fields.Integer("Points", required=True)
 
 
@@ -147,9 +200,16 @@ class ORAResponse(models.Model):
     _description = "Response"
 
     slide_id = fields.Many2one('slide.slide', "Content")
+    channel_id = fields.Many2one(
+        related="slide_id.channel_id",
+        string="Course",
+        store=True,
+        readonly=False  # Optional: allow override if needed
+    )
     user_id = fields.Many2one('res.users', "User")
     staff_id = fields.Many2one(related="slide_id.channel_id.user_id", string="Staff", store=True)
     feedback = fields.Html("Feedback", translate=True, sanitize_attributes=False, sanitize_form=False)
+    feedback_text = fields.Text("Feedback Text", compute="_compute_feedback_text", store=True)
     can_resubmit = fields.Boolean("Allow Resubmit")
     xp_points = fields.Integer("XP Points", compute="calculate_total_xp", store=True)
     user_response_line = fields.One2many('open.response.user.line', 'response_id' , string="Prompts")
@@ -162,6 +222,11 @@ class ORAResponse(models.Model):
         ('inactive', 'Inactive'),
         ('assessed', 'Assessed')
     ], default="active", tracking=True)
+    peer_status = fields.Selection([
+        ('not_applicable', 'Not Applicable'),
+        ('started', 'Assessment Started'),
+        ('completed', 'Assessment Completed')
+    ], string='Peer Assessment Status', compute='_compute_peer_status', default='not_applicable', tracking=True)
 
     @api.depends('slide_rubric_staff_line.total_score')
     def calculate_total_xp(self):
@@ -171,24 +236,60 @@ class ORAResponse(models.Model):
                 if line.assess_type == 'staff':
                     total_xp += line.total_score
             rec.xp_points = total_xp
+        
+    @api.constrains('feedback', 'can_resubmit')
+    def _check_feedback(self):
+        for record in self:
+            if record.can_resubmit:
+                feedback_text = record.feedback or ''
+                # Convert Markup to string and strip HTML tags
+                # If feedback is a Markup object, convert it to string
+                if isinstance(feedback_text, Markup):
+                    feedback_text = str(feedback_text)
+                cleaned_text = html.fromstring(feedback_text).text_content().strip() if feedback_text else ''
+                if not cleaned_text:
+                    raise ValidationError("Feedback is required when Allow Resubmit is True.")
 
+    @api.depends('slide_rubric_staff_line.state')
+    def _compute_peer_status(self):
+        for record in self:
+            assessments = record.slide_rubric_staff_line.filtered(lambda r: r.assess_type == 'peer')
+            if not assessments:
+                record.peer_status = 'not_applicable'
+            elif all(a.state == 'completed' for a in assessments):
+                record.peer_status = 'completed'
+            else:
+                record.peer_status = 'started'
+                
     def action_mark_assessed(self):
-        if self.state == 'submitted':
-            only_peer = True
-            for line in self.slide_rubric_staff_line:
-                if line.assess_type == 'staff':
-                    self.state = 'assessed'
-                    line.state = 'completed'
-                    user_karma = self.user_id.karma
-                    user_karma += self.xp_points
-                    self.sudo().user_id.karma = user_karma
-                    only_peer = False
-            if only_peer:
-                raise UserError("Please fill the rubric first.")
+        self.ensure_one()
+
+        # Step 1: Create wizard record
+        wizard = self.env['mark.assessed.wizard'].create({
+            'response_id': self.id,
+        })
+
+        # Step 2: Get rubrics and create lines for the wizard
+        slide_rubrics = self.env['open.response.rubric'].search([('slide_id', '=', self.slide_id.id)])
+        for rubric in slide_rubrics:
+            self.env['rubric.assess.line.wizard'].create({
+                'wizard_id': wizard.id,
+                'criteria_id': rubric.id,
+            })
+
+        # Step 3: Open wizard window
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mark.assessed.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+        }
 
 
 class OpenResponseUserLine(models.Model):
     _name = 'open.response.user.line'
+    _description = 'Open Response User Line'
 
     response_id = fields.Many2one('ora.response', ondelete="cascade")
     value_text_box = fields.Text("Text answer", translate=True)
@@ -199,9 +300,9 @@ class OpenResponseUserLine(models.Model):
     question_sequence = fields.Integer('Sequence', related='prompt_id.sequence', store=True)
     response_type = fields.Selection(string="Response Type", related="prompt_id.response_type")
 
-
 class OpenResponseRubricStaff(models.Model):
     _name = 'open.response.rubric.staff'
+    _description = 'Open Response Rubric Staff'
 
     response_id = fields.Many2one('ora.response', ondelete="cascade")
     assess_type = fields.Selection([
@@ -228,6 +329,7 @@ class OpenResponseRubricStaff(models.Model):
 
 class OpenResponseRubricAssess(models.Model):
     _name = 'open.response.rubric.assess'
+    _description = 'Open Response Rubric Assessment'
 
     criteria_id = fields.Many2one('open.response.rubric', 'Criteria', required=True)
     criteria_desc = fields.Text(related='criteria_id.name')
@@ -236,7 +338,17 @@ class OpenResponseRubricAssess(models.Model):
     criteria_option_point = fields.Integer(related='option_id.option_points')
     assess_explanation = fields.Text("Assess Explanation", required=True, translate=True)
     response_assess_id = fields.Many2one('open.response.rubric.staff', ondelete="cascade")
+    slide_id = fields.Many2one('slide.slide', compute='_compute_slide_id', store=False)
 
+    @api.depends('response_assess_id')
+    def _compute_slide_id(self):
+        for rec in self:
+            rec.slide_id = (
+                rec.response_assess_id.response_id.slide_id
+                if rec.response_assess_id and rec.response_assess_id.response_id
+                else False
+            )
+            
     @api.onchange('criteria_id')
     def onchange_criteria_id(self):
         for rec in self:

@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_mark_assessed_wizard_form" model="ir.ui.view">
+        <field name="name">mark.assessed.wizard.form</field>
+        <field name="model">mark.assessed.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirm Assessment">
+                <group string="Assessment Details">
+                    <field name="response_id" invisible="1" />
+                    <field name="user_response_lines" nolabel="1">
+                        <kanban>
+                            <field name="question_name"/>
+                            <field name="slide_id"/>
+                            <templates>
+                                <t t-name="card">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_details">
+                                            <strong><field name="question_name"/></strong>
+                                            <br />
+                                            <t t-if="record.value_text_box.raw_value">
+                                                <div><field name="value_text_box" /></div>
+                                            </t>
+                                            <t t-if="record.value_richtext_box.raw_value">
+                                                <div style="width: 80px;"><field name="value_richtext_box" /></div>
+                                            </t>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </group>
+
+                <group string="Peer Assessments" invisible="not peer_staff_lines">
+                    <field name="peer_staff_lines" nolabel="1">
+                        <kanban>
+                            <field name="user_id"/>
+                            <field name="submitted_date"/>
+                            <field name="state"/>
+                            <field name="total_score"/>
+                            <templates>
+                                <t t-name="card">
+                                    <div class="oe_kanban_card oe_kanban_global_click">
+                                        <div class="oe_kanban_details">
+                                            <strong><field name="user_id"/></strong>
+                                            <div>Submitted: <field name="submitted_date"/></div>
+                                            <div>State: <field name="state"/></div>
+                                            <div>
+                                                Score: <field name="total_score"/>
+                                                <t t-if="record.total_score == 1 or record.total_score == 0"> Point</t>
+                                                <t t-else=""> Points</t>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </t>
+                            </templates>
+                        </kanban>
+                    </field>
+                </group>
+
+                <form string="Confirm Assessment">
+                    <group string="Rubric Assessment">
+                        <field name="assess_line_ids" nolabel="1">
+                            <kanban editable="top" create="false" delete="false" can_open="0">
+                                <field name="criteria_id"/>
+                                <field name="option_id"/>
+                                <field name="assess_explanation"/>
+                                <templates>
+                                    <t t-name="card">
+                                        <div class="oe_kanban_card">
+                                            <div class="oe_kanban_details">
+                                                <div style="margin-bottom: 10px;"><strong>Criteria:</strong> <field name="criteria_id" style="margin-left:10px;"/></div>
+                                                <div style="margin-bottom: 10px;"><strong>Option:</strong> <field name="option_id" widget="selection" style="width:80%;margin-left:10px;display: inline-block;"/></div>
+                                                <div style="margin-bottom: 10px;"><strong>Explanation:</strong> <widget name="kanban_textarea_handler" /></div>
+                                            </div>
+                                        </div>
+                                    </t>
+                                </templates>
+                            </kanban>
+                        </field>
+                    </group>
+                </form>
+
+                <footer>
+                    <button string="Confirm" type="object" name="confirm_assessment" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

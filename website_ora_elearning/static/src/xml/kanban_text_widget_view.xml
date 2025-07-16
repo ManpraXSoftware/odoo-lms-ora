@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+   <t t-name="website_ora_elearning.kanban_textarea">
+       <div>
+           <t t-if="this.props.readonly">
+               <textarea class="oe_kanban_textarea form-control" name="kanban_widget" t-on-change="this.onInputChange"></textarea>
+           </t>
+
+       </div>
+   </t>
+</templates>
