@@ -5,10 +5,10 @@
     'category': 'Website/eLearning',
     'summary': 'Manage and publish an eLearning platform',
     'sequence': 10,
-    'version': '2.6',
+    'version': '2.7',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
-    'depends': ['website_slides'],
+    'depends': ['website_slides','mass_mailing'],
     'data': [
         'data/ir_cron_data.xml',
         'data/email_templates.xml',
