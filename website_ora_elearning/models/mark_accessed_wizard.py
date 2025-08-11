@@ -1,5 +1,10 @@
+import re
 from odoo import models, fields, api
 from odoo.exceptions import UserError
+from odoo.addons.iap.tools import iap_tools
+from markupsafe import Markup
+
+DEFAULT_OLG_ENDPOINT = 'https://olg.api.odoo.com'
 
 class MarkAssessedWizard(models.TransientModel):
     _name = 'mark.assessed.wizard'
@@ -32,6 +37,8 @@ class MarkAssessedWizard(models.TransientModel):
         string="Response Assessment"
     )
     assess_line_ids = fields.One2many('rubric.assess.line.wizard', 'wizard_id', string="Rubric Lines")
+
+    ai_score_result = fields.Text(string="AI Score Result", readonly=True)
 
     @api.depends('response_id')
     def _compute_user_response_lines(self):
@@ -146,6 +153,57 @@ class MarkAssessedWizard(models.TransientModel):
             })
 
         return {'type': 'ir.actions.act_window_close'}
+
+    def action_update_score(self):
+        for wizard in self:
+            IrConfigParameter = self.env['ir.config_parameter'].sudo()
+            olg_api_endpoint = IrConfigParameter.get_param('web_editor.olg_api_endpoint', DEFAULT_OLG_ENDPOINT)
+            database_id = IrConfigParameter.get_param('database.uuid')
+            
+            response_data = []
+            for line in wizard.user_response_lines:
+                answer = (
+                    line.value_richtext_box or
+                    line.value_text_box or
+                    False
+                )
+                response_data.append({
+                    'question_name': line.question_name,
+                    'answer': answer,
+                })
+
+            # prompt = 'ai suggestion score recommendation\nquestion 1: what is an apple?\nanswer 1: apple is a fruit'
+            prompt_lines = ['ai suggestion score recommendation']
+            for idx, item in enumerate(response_data, 1):
+                question = item['question_name']
+                answer = item['answer'] if item['answer'] else ''
+                prompt_lines.append(f'question {idx}: {question}')
+                prompt_lines.append(f'answer {idx}: {answer}')
+            
+            prompt = '\n'.join(prompt_lines)
+
+            # For debug or usage
+            print(prompt)
+            conversation_history = [{'role': 'user', 'content': prompt}]
+
+            try:
+                response = iap_tools.iap_jsonrpc(olg_api_endpoint + "/api/olg/1/chat", params={
+                    'prompt': prompt,
+                    'conversation_history': conversation_history,
+                    'database_id': database_id,
+                }, timeout=30)
+
+                wizard.ai_score_result = response.get('content', 'No response received.')
+            except Exception as e:
+                wizard.ai_score_result = f"Error: {str(e)}"
+
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'mark.assessed.wizard',
+            'res_id': self.id,
+            'view_mode': 'form',
+            'target': 'new',
+        }
 
 
     
