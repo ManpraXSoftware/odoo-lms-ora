@@ -172,8 +172,7 @@ class MarkAssessedWizard(models.TransientModel):
                     'answer': answer,
                 })
 
-            # prompt = 'ai suggestion score recommendation\nquestion 1: what is an apple?\nanswer 1: apple is a fruit'
-            prompt_lines = ['ai suggestion score recommendation']
+            prompt_lines = ['ai suggestion score recommendation and give me plagarism score without using any external tools']
             for idx, item in enumerate(response_data, 1):
                 question = item['question_name']
                 answer = item['answer'] if item['answer'] else ''
@@ -182,8 +181,6 @@ class MarkAssessedWizard(models.TransientModel):
             
             prompt = '\n'.join(prompt_lines)
 
-            # For debug or usage
-            print(prompt)
             conversation_history = [{'role': 'user', 'content': prompt}]
 
             try:

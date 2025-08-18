@@ -31,16 +31,14 @@
                     </field>
                 </group>
 
-                <!-- <form string="AI Score Checker"> -->
-                    <group string="AI Score Evaluation and Plagiarism Checker">
-                        <button name="action_update_score"
-                            type="object"
-                            string="Evaluate Score &amp; Check Plagiarism"
-                            class="btn btn-primary"
-                            invisible="ai_score_result == True"/>
-                    </group>
-                    <field name="ai_score_result" widget="text" readonly="1"/>
-                <!-- </form> -->
+                <group string="AI Score Evaluation and Plagiarism Checker">
+                    <button name="action_update_score"
+                        type="object"
+                        string="Evaluate Score &amp; Check Plagiarism"
+                        class="btn btn-primary"
+                        invisible="ai_score_result"/>
+                </group>
+                <field name="ai_score_result" widget="text" readonly="1"/>
 
                 <group string="Peer Assessments" invisible="not peer_staff_lines">
                     <field name="peer_staff_lines" nolabel="1">
