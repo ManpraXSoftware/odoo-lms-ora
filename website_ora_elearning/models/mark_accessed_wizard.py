@@ -103,47 +103,54 @@ class MarkAssessedWizard(models.TransientModel):
 
         # Step 6: Send email and notification
         if slide.notify_user:
-            template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
-            base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-            action = self.env.ref('website_ora_elearning.action_ora_response')
-            url = f"{base_url}/odoo/action-{action.id}/{self.response_id.id}"
+            # template = self.env.ref('website_ora_elearning.email_template_assessment_completed')
+            # base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
+            # action = self.env.ref('website_ora_elearning.action_ora_response')
+            # url = f"{base_url}/odoo/action-{action.id}/{self.response_id.id}"
+            email_values = {
+                'email_cc': False,
+                'auto_delete': False,
+                'message_type': 'user_notification',
+                'scheduled_date': False,
+                'partner_ids': [],
+                'email_to': self.response_id.user_id.partner_id.email_formatted,
+            }
+            email_template = self.env.ref('website_ora_elearning.email_template_assessment_completed', raise_if_not_found=False).sudo()
+            email_template.sudo().with_context(
+                slide_name=slide.name,
+                user_email=self.response_id.user_id.email_formatted,
+                user_name=self.response_id.user_id.name,
+                staff_name=self.response_id.staff_id.sudo().partner_id.name,
+                url=slide.website_url + '?fullscreen=1#',
+                company_email = self.env.company.email_formatted,
+            ).send_mail(self.response_id.id, force_send=True, email_values=email_values)
 
-            if template:
-                template.sudo().with_context(
-                    slide_name=slide.name,
-                    user_email=self.response_id.user_id.email_formatted,
-                    user_name=self.response_id.user_id.name,
-                    staff_name=self.response_id.staff_id.sudo().partner_id.name,
-                    url=slide.website_url + '?fullscreen=1#',
-                    company_email = self.env.company.email_formatted,
-                ).send_mail(self.response_id.id, force_send=True)
-
-            msg = self.env['mail.message'].create({
-                'model': 'res.partner',
-                'res_id': slide.user_id.partner_id.id,
-                'message_type': 'comment',
-                'subtype_id': self.env.ref('mail.mt_comment').id,
-                'author_id': self.env.user.partner_id.id,
-                'body': f"""
-                    <p>Your assessment for the ORA content <strong>{slide.name}</strong> has been reviewed and evaluated by staff member <strong>{self.response_id.staff_id.sudo().partner_id.name}</strong>.</p>
-                    <div style="padding: 16px 8px; text-align: center;">
-                        <a href="{url}" style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                            View ORA Response
-                        </a>
-                    </div>
-                    <p>We hope you enjoy this feedback and continue learning with us!</p>
-                    <br/>
-                    <p>Best regards,<br/>
-                    {self.response_id.user_id.partner_id.name or ''}</p>
-                """,
-            })
-            self.env['mail.notification'].create({
-                'author_id': msg.author_id.id,
-                'mail_message_id': msg.id,
-                'res_partner_id': slide.user_id.partner_id.id,
-                'notification_type': 'inbox',
-                'notification_status': 'sent',
-            })
+            # msg = self.env['mail.message'].create({
+            #     'model': 'res.partner',
+            #     'res_id': slide.user_id.partner_id.id,
+            #     'message_type': 'comment',
+            #     'subtype_id': self.env.ref('mail.mt_comment').id,
+            #     'author_id': self.env.user.partner_id.id,
+            #     'body': f"""
+            #         <p>Your assessment for the ORA content <strong>{slide.name}</strong> has been reviewed and evaluated by staff member <strong>{self.response_id.staff_id.sudo().partner_id.name}</strong>.</p>
+            #         <div style="padding: 16px 8px; text-align: center;">
+            #             <a href="{url}" style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
+            #                 View ORA Response
+            #             </a>
+            #         </div>
+            #         <p>We hope you enjoy this feedback and continue learning with us!</p>
+            #         <br/>
+            #         <p>Best regards,<br/>
+            #         {self.response_id.user_id.partner_id.name or ''}</p>
+            #     """,
+            # })
+            # self.env['mail.notification'].create({
+            #     'author_id': msg.author_id.id,
+            #     'mail_message_id': msg.id,
+            #     'res_partner_id': slide.user_id.partner_id.id,
+            #     'notification_type': 'inbox',
+            #     'notification_status': 'sent',
+            # })
 
         return {'type': 'ir.actions.act_window_close'}
 

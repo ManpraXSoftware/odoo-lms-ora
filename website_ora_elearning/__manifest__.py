@@ -8,7 +8,7 @@
     'version': '2.7',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
-    'depends': ['website_slides','mass_mailing'],
+    'depends': ['html_editor','website_slides','mass_mailing','website_forum'],
     'data': [
         'data/ir_cron_data.xml',
         'data/email_templates.xml',
@@ -23,8 +23,12 @@
     'assets': {
         'web.assets_frontend': [
             'website_ora_elearning/static/src/scss/website_slides.scss',
+            'website_ora_elearning/static/src/components/resizer.scss',
+            'website_ora_elearning/static/src/components/resizer_hook.js',
+            'website_ora_elearning/static/src/components/website_ora_wysiwyg.js',
+            'website_ora_elearning/static/src/components/website_ora_wysiwyg.xml',
+            'website_ora_elearning/static/src/interactions/website_ora.js',
             'website_ora_elearning/static/src/js/ora_fullscreen.js',
-            'website_ora_elearning/static/src/js/website_ora.js',
             'website_ora_elearning/static/src/xml/slide_ora.xml',
         ],
         'web.assets_backend': [

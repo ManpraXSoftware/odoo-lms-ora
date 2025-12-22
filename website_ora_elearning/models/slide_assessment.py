@@ -124,7 +124,7 @@ class Slide(models.Model):
             to_allocate_user[partner_id]['peer_count'] = len(rubric_line_ids)
             to_allocate_user[partner_id]['responses'] = rubric_line_ids.mapped('response_id').ids
         # Remove ids whose peer limit has reached.
-        to_allocate_user = dict((key, val) for key, val in to_allocate_user.items() if val['peer_count'] < peer_limit)
+        to_allocate_user = dict((key, val) for key, val in to_allocate_user.items())
         # Sorting dict w.r.t peer_count.
         sorted_allocate_user_dic = dict(sorted(to_allocate_user.items(), key=lambda x: x[1]['peer_count']))
         # Appending those users in list whose responses does not have current response.

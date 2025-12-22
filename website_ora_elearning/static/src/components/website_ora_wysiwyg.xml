@@ -1,0 +1,11 @@
+<templates xml:space="preserve">
+    <t t-name="website_ora_elearning.WebsiteOraWysiwyg" t-inherit="html_editor.Wysiwyg" t-inherit-mode="primary">
+        <xpath expr="." position="inside">
+            <div t-if="props.resizable" class="o_wysiwyg_resizer_ora" t-on-mousedown.prevent="onResizerMouseDownOra">
+                <div class="o_wysiwyg_resizer_hook_ora"></div>
+                <div class="o_wysiwyg_resizer_hook_ora"></div>
+                <div class="o_wysiwyg_resizer_hook_ora"></div>
+            </div>
+        </xpath>
+    </t>
+</templates>

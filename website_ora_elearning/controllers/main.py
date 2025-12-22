@@ -55,7 +55,7 @@ class WebsiteSlidesORA(WebsiteSlides):
             if slide.peer_assessment:
                 peer_users = self._assign_peer_review_users(slide, user_response)
                 if slide.notify_peer:
-                    self._notify_peer_users(slide, user_response, peer_users)
+                    self._notify_peer_users(slide, peer_users)
             else:
                 if slide.notify_staff:
                     self._notify_staff(slide, user_response)
@@ -86,48 +86,21 @@ class WebsiteSlidesORA(WebsiteSlides):
 
         return peer_users
 
-    def _notify_peer_users(self, slide, user_response, peer_users):
+    def _notify_peer_users(self, slide, peer_users):
         for peer in peer_users:
-            msg = request.env['mail.message'].create({
-                'model': 'res.partner',
-                'res_id': peer.partner_id.id,
-                'message_type': 'comment',
-                'subtype_id': request.env.ref('mail.mt_comment').id,
-                'author_id': request.env.user.partner_id.id,
-                'body': f"""
-                    <p><strong>{user_response.user_id.partner_id.name}</strong> has submitted an assessment for the ORA content titled <strong>{slide.name}</strong>.</p>
-                    <p>We kindly request you to review and rate the submission at your earliest convenience.</p>
-                    <div style="padding: 16px 8px; text-align: center;">
-                        <a href="{slide.website_url}?fullscreen=1#"
-                        style="background-color: #875a7b; padding: 8px 16px; text-decoration: none; color: #fff; border-radius: 5px;">
-                            View ORA Response
-                        </a>
-                    </div>
-                    <p>Thank you for your valuable time and feedback.</p>
-                    <br/>
-                    <p>Best regards,<br/>
-                    {user_response.user_id.partner_id.name or ''}</p>
-                    """,
-            })
-            request.env['mail.notification'].create({
-                'author_id': msg.author_id.id,
-                'mail_message_id': msg.id,
-                'res_partner_id': peer.partner_id.id,
-                'notification_type': 'inbox',
-                'notification_status': 'sent',
-            })
-            template = request.env.ref('website_ora_elearning.email_template_peer_review_submitted')
-            if template:
-                template.sudo().with_context(
-                    user_response_id=user_response.id,
-                    peer_user_email=peer.partner_id.email_formatted,
-                    peer_user_name=peer.partner_id.name,
-                    user_id=request.env.user.id,
-                    user_name=request.env.user.name,
-                    slide_name=slide.name,
-                    slide_url=slide.website_url + '?fullscreen=1#',
-                    company_email = request.env.company.email_formatted
-                ).send_mail(peer.id, force_send=True)
+            email_values = {
+                'email_cc': False,
+                'auto_delete': False,
+                'message_type': 'user_notification',
+                'scheduled_date': False,
+                'partner_ids': [],
+                'email_to': peer.partner_id.email_formatted,
+            }
+            email_template = request.env.ref('website_ora_elearning.email_template_peer_review_submitted', raise_if_not_found=False).sudo()
+            email_template.with_context(slide_name=slide.name,peer_user_name=peer.partner_id.name,user_name=request.env.user.name,slide_url=slide.website_url + '?fullscreen=1#',).send_mail(res_id=peer.id,force_send=True, email_values=email_values)
+
+        return {'success': True, 'message': 'All peers are notified!'}
+            
 
     def _notify_staff(self, slide, user_response):
         staff = user_response.staff_id
@@ -242,7 +215,7 @@ class WebsiteSlidesORA(WebsiteSlides):
             ]).mapped('response_id')
         return values
 
-    @http.route('/slides/slide/get_values', website=True, type="json", auth="user")
+    @http.route('/slides/slide/get_values', website=True, type="jsonrpc", auth="user")
     def slide_get_value(self, slide_id):
         csrf_token = request.csrf_token()
         slide = request.env['slide.slide'].browse(slide_id)
@@ -489,7 +462,7 @@ class WebsiteSlidesORA(WebsiteSlides):
             result[ora_response.slide_id.id]['quiz_karma_won'] += ora_response.xp_points
         return result
     
-    @http.route(['/slides/channel/leave'], type='json', auth='user', website=True)
+    @http.route(['/slides/channel/leave'], type='jsonrpc', auth='user', website=True)
     def slide_channel_leave(self, channel_id):
         slide_ids = request.env['slide.slide'].sudo().search([('channel_id','=',int(channel_id))])
         for slide_id in slide_ids:

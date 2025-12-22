@@ -220,11 +220,9 @@
                     <filter string="Submitted" name="submitted" domain="[('state', '=', 'submitted')]"/>
                     <filter string="Active" name="active" domain="[('state', '=', 'active')]"/>
                     <filter string="Inactive" name="inactive" domain="[('state', '=', 'inactive')]"/>
-                    <group expand="0" string="Group By">
-                        <filter name="state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
-                        <filter string="Staff" name="group_by_staff" domain="[]" context="{'group_by': 'staff_id'}"/>
-                        <filter string="Users" name="group_by_user" domain="[]" context="{'group_by': 'user_id'}"/>
-                    </group>
+                    <filter name="state" string="Status" domain="[]" context="{'group_by': 'state'}"/>
+                    <filter string="Staff" name="group_by_staff" domain="[]" context="{'group_by': 'staff_id'}"/>
+                    <filter string="Users" name="group_by_user" domain="[]" context="{'group_by': 'user_id'}"/>
                 </search>
             </field>
         </record>

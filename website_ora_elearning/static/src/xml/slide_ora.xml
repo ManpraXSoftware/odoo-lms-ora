@@ -6,7 +6,7 @@
                 display: inline;
             }
         </style>
-            <div class="o_wslides_fs_quiz_container o_wslides_wrap w-100 o_user_response" style="background-color: rgb(236 236 236);overflow-x:hidden;">
+            <div class="o_wslides_fs_quiz_container o_wslides_ora_fullscreen o_wslides_wrap w-100 o_user_response" style="background-color: rgb(236 236 236);overflow-x:hidden;">
                 <ul class="nav nav-tabs o_wslides_lesson_nav" role="tablist">
                     <li class="nav-item">
                         <a href="#ora_assessment" aria-controls="ora_assessment" data-oe-model="slide.slide" class="nav-link active" role="tab" data-bs-toggle="tab">
@@ -33,8 +33,8 @@
                                                     <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="response.ora_res_user_image_url" alt="Avatar"
                                                     style="height:70px;width:70px;"/>
                                                     <div>
-                                                        <h5 class="o_wforum_bio_popover_name mb-0" t-esc="response.user_name"/>
-                                                        <span class="o_wforum_bio_popover_info" t-esc="response.user_name"/>
+                                                        <h5 class="o_wforum_bio_popover_name mb-0" t-out="response.user_name"/>
+                                                        <span class="o_wforum_bio_popover_info" t-out="response.user_name"/>
                                                     </div>
                                                 </div>
                                             </t>
@@ -49,7 +49,7 @@
                                                     </div>
                                                     <t t-if="response.state != 'assessed'">
                                                         <span class="ml-2" style="margin-left: 5px;">Your response has been submitted successfully on
-                                                            <t t-esc="response.submitted_date"/>
+                                                            <t t-out="response.submitted_date"/>
                                                         </span>
                                                     </t>
                                                     <t t-if="response.state == 'assessed'">
@@ -94,8 +94,8 @@
                                                         <img class="o_forum_avatar_big flex-shrink-0 mr-3" t-att-src="response.feedback_user_image_url" alt="Avatar"
                                                         style="height:75px;width75px;margin-left:13px;"/>
                                                         <div>
-                                                            <h5 class="o_wforum_bio_popover_name mb-0" t-esc="response.staff_name"/>
-                                                            <span class="o_wforum_bio_popover_info" t-esc="response.staff_name"/>
+                                                            <h5 class="o_wforum_bio_popover_name mb-0" t-out="response.staff_name"/>
+                                                            <span class="o_wforum_bio_popover_info" t-out="response.staff_name"/>
                                                         </div>
                                                     </div>
                                                 </t>
@@ -198,8 +198,8 @@
             <t t-foreach="widget.peer_responses" t-as="response" t-key="response">
                 <t t-set="count" t-value="count + 1"/>
                 <div class="mt-3 list-group-item list-group-item-light" style="line-height: 3.2em;">
-                    <span style="margin-left:10px;">Learner Response <t t-esc="count"/>
-                        <t t-if="response.submitted_date"> assessed on <t t-esc="response.submitted_date"/></t>
+                    <span style="margin-left:10px;">Learner Response <t t-out="count"/>
+                        <t t-if="response.submitted_date"> assessed on <t t-out="response.submitted_date"/></t>
                     </span>
                     <button t-if="widget.slide.completed &amp;&amp; widget.slide.hasNext" class="btn btn-primary o_wslides_ora_continue" style="float:right;position:relative;margin-top:6px;margin-right:7px;">
                         Continue <i class="fa fa-chevron-right ms-1"/>
@@ -239,8 +239,8 @@
                     <ul class="list-group">
                         <li class="list-group-item mb-3">
                             <div class="mb-3">
-                                <h5><t t-esc="rubric.criterian_name"/></h5>
-                                <span t-esc="rubric.name"/>
+                                <h5><t t-out="rubric.criterian_name"/></h5>
+                                <span t-out="rubric.name"/>
                             </div>
                             <div class="o_select_option mb-3 row" style="margin: auto;">
                                 <select class="form-select" t-attf-name="options_{{response.id}}_{{rubric.id}}"
@@ -248,7 +248,7 @@
                                     style="width:auto;margin-right: 20px;margin-bottom: 20px;">
                                     <t t-foreach="rubric.criterian_ids" t-as="option" t-key="option">
                                         <option t-att-value="option.id">
-                                            <t t-esc="option.name"/>
+                                            <t t-out="option.name"/>
                                         </option>
                                     </t>
                                 </select>
@@ -273,20 +273,20 @@
                         <t t-foreach="response.option_ids" t-as="res_rubric" t-key="res_rubric">
                             <tr>
                                 <td style="text-align: center;vertical-align: middle;">
-                                    <strong><span t-esc="res_rubric.criterian_name"/></strong>
+                                    <strong><span t-out="res_rubric.criterian_name"/></strong>
                                 </td>
                                 <t t-foreach="widget.slide.rubric_ids" t-as="rubric" t-key="rubric">
                                     <t t-foreach="rubric.criterian_ids" t-as="option" t-key="option">
                                         <t t-if="res_rubric.id == rubric.id">
                                             <td t-attf-style="background-color:#{res_rubric.name == option.name and '#d9edf7'};
                                             overflow-wrap: anywhere;text-align: center;vertical-align: middle;">
-                                                <t t-esc="option.name"/>
+                                                <t t-out="option.name"/>
                                                 <t t-if="res_rubric.name == option.name">
                                                     <t t-set="points" t-value="'   ('+res_rubric.criteria_option_point+' points)'"/>
-                                                    <t t-esc="points"></t>
+                                                    <t t-out="points"></t>
                                                     <br/>
                                                     <t t-if="res_rubric.assess_explanation">
-                                                        <span t-esc="res_rubric.assess_explanation" style="font-size:15px;"/>
+                                                        <span t-out="res_rubric.assess_explanation" style="font-size:15px;"/>
                                                     </t>
                                                 </t>
                                             </td>
@@ -316,7 +316,7 @@
                             <t t-foreach="staff_line.option_ids" t-as="res_rubric" t-key="res_rubric">
                                 <tr>
                                     <td style="text-align: center;vertical-align: middle;">
-                                        <strong><span t-esc="res_rubric.criterian_name"/></strong>
+                                        <strong><span t-out="res_rubric.criterian_name"/></strong>
                                     </td>
                                     <t t-foreach="widget.slide.rubric_ids" t-as="rubric" t-key="rubric">
                                         <t t-foreach="rubric.criterian_ids" t-as="option" t-key="option">
@@ -333,13 +333,13 @@
                                                             <span t-esc="res_rubric.assess_explanation" style="font-size:12px;"/>
                                                         </t>
                                                     </t> -->
-                                                    <t t-esc="option.name"/>
+                                                    <t t-out="option.name"/>
                                                     <t t-if="res_rubric.name == option.name">
                                                         <t t-set="points" t-value="'   ('+res_rubric.criteria_option_point+' points)'"/>
-                                                        <t t-esc="points"></t>
+                                                        <t t-out="points"></t>
                                                         <br/>
                                                         <t t-if="res_rubric.assess_explanation">
-                                                            <span t-esc="res_rubric.assess_explanation" style="font-size:15px;"/>
+                                                            <span t-out="res_rubric.assess_explanation" style="font-size:15px;"/>
                                                         </t>
                                                     </t>
                                                 </td>
@@ -380,7 +380,7 @@
                             <t t-if="prompt.response_type == 'text'">
                                 <span class="input-group-text">Your Response</span>
                                 <div class="input-group" style="text-align: justify;">
-                                    <textarea t-attf-class="form-control response_div_#{prompt.id}" t-att-name="prompt.id" required="required"><t t-esc="user_input.value_text_box"/></textarea>
+                                    <textarea t-attf-class="form-control response_div_#{prompt.id}" t-att-name="prompt.id" required="required"><t t-out="user_input.value_text_box"/></textarea>
                                 </div>
                             </t>
                             <t t-if="prompt.response_type == 'rich_text'">
@@ -388,7 +388,7 @@
                                 <div t-attf-class="position-relative o_wysiwyg_textarea_wrapper response_div_#{prompt.id}" style="background-color: white;">
                                     <textarea class="form-control o_wysiwyg_loader" 
                                         t-att-name="prompt.id" required="required">
-                                        <t t-esc="user_input.value_richtext_box"/>
+                                        <t t-out="user_input.value_richtext_box"/>
                                     </textarea>
                                 </div>
                             </t>
@@ -412,7 +412,7 @@
                 <t t-if="prompt.name">
                     <div class="o_wslides_quiz_answer_info list-group-item list-group-item-info">
                         <i class="fa fa-info-circle me-2"/>
-                        <span class="o_wslides_quiz_answer_comment" t-esc="prompt.name"/>
+                        <span class="o_wslides_quiz_answer_comment" t-out="prompt.name"/>
                     </div>
                 </t>
             </div>
@@ -436,7 +436,7 @@
                             <t t-if="prompt.response_type == 'text'">
                                 <div style="display: flex; color: black; font-size: 15px; margin-bottom: 5px;">
                                     <span style="margin-right: 8px;">Answer:</span>
-                                    <span style="white-space: break-spaces;" t-esc="user_input.value_text_box"/>
+                                    <span style="white-space: break-spaces;" t-out="user_input.value_text_box"/>
                                 </div>
                                 <br />
                             </t>
