@@ -21,7 +21,10 @@
         'views/mark_accessed_wizard.xml',
     ],
     'assets': {
+        # 'web_editor.assets_snippets_menu': [
+        # ],
         'web.assets_frontend': [
+            'website_ora_elearning/static/src/js/owl_utils.js',
             'website_ora_elearning/static/src/scss/website_slides.scss',
             'website_ora_elearning/static/src/components/resizer.scss',
             'website_ora_elearning/static/src/components/resizer_hook.js',
@@ -30,6 +33,7 @@
             'website_ora_elearning/static/src/interactions/website_ora.js',
             'website_ora_elearning/static/src/js/ora_fullscreen.js',
             'website_ora_elearning/static/src/xml/slide_ora.xml',
+            'website_ora_elearning/static/src/js/loadWysiwygFromTextarea.js',
         ],
         'web.assets_backend': [
             'website_ora_elearning/static/src/js/kanban_textarea_save.js',
