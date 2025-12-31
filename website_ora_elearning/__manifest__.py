@@ -5,7 +5,7 @@
     'category': 'Website/eLearning',
     'summary': 'Manage and publish an eLearning platform',
     'sequence': 10,
-    'version': '2.7',
+    'version': '19.0.1.0',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
     'depends': ['html_editor','website_slides','mass_mailing','website_forum'],
