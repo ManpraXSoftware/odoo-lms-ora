@@ -5,10 +5,10 @@
     'category': 'Website/eLearning',
     'summary': 'Manage and publish an eLearning platform',
     'sequence': 10,
-    'version': '2.7',
+    'version': '19.0.1.0',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
-    'depends': ['website_slides','mass_mailing'],
+    'depends': ['html_editor','website_slides','mass_mailing','website_forum'],
     'data': [
         'data/ir_cron_data.xml',
         'data/email_templates.xml',
@@ -21,11 +21,19 @@
         'views/mark_accessed_wizard.xml',
     ],
     'assets': {
+        # 'web_editor.assets_snippets_menu': [
+        # ],
         'web.assets_frontend': [
+            'website_ora_elearning/static/src/js/owl_utils.js',
             'website_ora_elearning/static/src/scss/website_slides.scss',
+            'website_ora_elearning/static/src/components/resizer.scss',
+            'website_ora_elearning/static/src/components/resizer_hook.js',
+            'website_ora_elearning/static/src/components/website_ora_wysiwyg.js',
+            'website_ora_elearning/static/src/components/website_ora_wysiwyg.xml',
+            'website_ora_elearning/static/src/interactions/website_ora.js',
             'website_ora_elearning/static/src/js/ora_fullscreen.js',
-            'website_ora_elearning/static/src/js/website_ora.js',
             'website_ora_elearning/static/src/xml/slide_ora.xml',
+            'website_ora_elearning/static/src/js/loadWysiwygFromTextarea.js',
         ],
         'web.assets_backend': [
             'website_ora_elearning/static/src/js/kanban_textarea_save.js',

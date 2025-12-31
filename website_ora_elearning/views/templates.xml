@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <template id="slide_sidebar_done_button_inherit_ora"
+              inherit_id="website_slides.slide_sidebar_done_button"
+              name="Sidebar Done Button (ORA additions)">
+            <xpath expr="//div[contains(@class,'o_wslides_sidebar_done_button')]" position="attributes">
+                <attribute name="t-att-data-has-ora">slide.prompt_ids and 1 or 0</attribute>
+            </xpath>
+            <xpath expr="//button" position="attributes">
+                <!-- When slide.prompt_ids is truthy, render disabled attr -->
+                <attribute name="t-att-disabled">slide.prompt_ids or None</attribute>
+            </xpath>
+
+        </template>
         <template id="slide_content_detailed_inherit_ora" inherit_id="website_slides.slide_content_detailed">
             <span t-attf-class="mx-2 my-1 badge #{'text-bg-success' if slide_completed else 'text-bg-info'}" position="attributes">
                 <attribute name="t-if">"slide.question_ids and (slide_completed or quiz_karma_gain) or slide.prompt_ids"</attribute>
@@ -421,7 +433,7 @@
                     <t t-if="prompt['response_type'] == 'text'">
                         <span class="input-group-text">Your Response</span>
                         <div class="input-group" style="text-align: justify;">
-                            <textarea class="form-control" t-att-name="prompt['id']"></textarea>
+                            <textarea class="form-control" required="required" t-att-name="prompt['id']"></textarea>
                         </div>
                     </t>
                     <t t-if="prompt['response_type'] == 'rich_text'">
@@ -590,12 +602,16 @@
             </span>
             <ul class="o_wslides_lesson_aside_list_links list-group mb-1 list-unstyled fw-light" position="attributes">
                  <t t-if="'is_sequential' not in aside_slide.fields_get()">
-                    <attribute name="t-if">aside_slide.prompt_ids or aside_slide.sudo().slide_resource_ids or aside_slide.question_ids</attribute>
+                    <attribute name="t-if">aside_slide.sudo().prompt_ids or aside_slide.sudo().slide_resource_ids or aside_slide.question_ids</attribute>
                 </t>
             </ul>
-            <ul class="o_wslides_lesson_aside_list_links list-group mb-1 list-unstyled fw-light" position="inside">
+            <xpath expr="//ul[contains(@class,'o_wslides_lesson_aside_list_links')]/li" position="after">
+            
+            <!-- <ul class="o_wslides_lesson_aside_list_links list-group mb-1 list-unstyled fw-light" position="inside"> -->
                  <t t-if="'is_sequential' not in aside_slide.fields_get()">
-                    <li class="ps-4">
+                    <li class="ps-3">
+                        <!-- <p>jjjjjjjjjjjjjjj</p> -->
+                        <!-- <t t-esc="slide.prompt_ids"/> -->
                         <a t-if="can_access and aside_slide.prompt_ids" t-att-href="'/slides/slide/%s#lessonAssessment' % (slug(aside_slide))" class="o_wslides_lesson_aside_list_link text-decoration-none small text-600">
                             <i class="fa fa-flag text-warning"/> Assessment
                         </a>
@@ -605,7 +621,8 @@
                         </span>
                     </li>
                 </t>
-            </ul>
+            <!-- </ul> -->
+            </xpath>
         </template>
         <template id="lesson_content_peer_responses">
             <div class="o_wslides_js_lesson_ora" id="peer" style="margin-left:15px;margin-right:15px;">

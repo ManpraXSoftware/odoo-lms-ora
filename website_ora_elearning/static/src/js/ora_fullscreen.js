@@ -5,8 +5,9 @@
     import publicWidget from '@web/legacy/js/public/public_widget';
     import Fullscreen from "@website_slides/js/slides_course_fullscreen_player";
     import { markup } from "@odoo/owl";
-    import { loadWysiwygFromTextarea } from "@web_editor/js/frontend/loadWysiwygFromTextarea";
     import { rpc } from "@web/core/network/rpc";
+    import { isMobileOS } from "@web/core/browser/feature_detection";
+    import { loadWysiwygFromTextarea } from "./loadWysiwygFromTextarea";
 
     var findSlide = function (slideList, matcher) {
         return slideList.find((slide) => {
@@ -41,7 +42,11 @@
             }
 
             this._slideValue = slide;
-
+            // this.interaction = useService("interactions");
+            // this.colibri = new Colibri(this, env, metadata);
+            // this.oraInteraction = new Interaction(this, {
+            //     el: this.el,   // important: bind to fullscreen DOM
+            // });
             this.sidebar = new NewSidebar(this, this.slides, slide);
             return result;
         },
@@ -54,7 +59,7 @@
                 try {
                     if (!!slideData.hasOra) {
                         slideData._autoSetDone = false;
-                    } 
+                    }
                     else if (!(slideData.isOra) && !(slideData.hasQuestion) && slideData.category != 'certification') {
                         slideData._autoSetDone = true;
                     }
@@ -173,11 +178,12 @@
         _renderSlide: function () {
             var def = this._super.apply(this, arguments);
             var $content = this.$('.o_wslides_fs_content');
-            var self = this;
+            const fullscreenWidget = this;
             if (this._slideValue.isOra === true) {
                 rpc('/slides/slide/get_values', {
                     slide_id: (this._slideValue.id),
                 }).then(function (data) {
+                    const widget = fullscreenWidget;
                     if (data.slide_prompts) {
                         for (let i = 0; i < data.slide_prompts.length; i++) {
                             data.slide_prompts[i].question = markup(data.slide_prompts[i].question)
@@ -199,14 +205,25 @@
                         }
                     }
                     $content.empty().append(renderToFragment('slide.ora.assessment', {widget: data}));
-                    $('textarea.o_wysiwyg_loader').toArray().forEach((textarea) => {
-                        var $textarea = $(textarea);
-                        var options = {
-                            resizable: true,
-                            userGeneratedContent: true,
-                            height: 100,
+                    $content.find("textarea.o_wysiwyg_loader").toArray().forEach((textarea) => {
+                        
+                        const value = textarea.innerHTML.trim();
+                        textarea.value = value;
+                        const props = {
+                            fullEdit: true,
+                            value: value,
+                            getRecordInfo: () => ({
+                                context: this.services.website_page.context,
+                                resModel: "open.response.user.line",
+                                resId: +browser.location.pathname
+                                    .split("-")
+                                    .slice(-1)[0]
+                                    .split("/")[0],
+                            }),
+                            resizable: !isMobileOS(),
+                            height: "100px",
                         };
-                        loadWysiwygFromTextarea(self, $textarea[0], options)
+                        loadWysiwygFromTextarea(this, textarea, props)
                     });
                     $('.custom_response').click(function () {
                         var id = this.id.split('-')[this.id.split('-').length - 1];
@@ -218,7 +235,7 @@
                             button.children().text(_t('View Response'));
                         });
                     });                    
-                });
+                }.bind(this));
             }
             return Promise.all([def]);
         },
