@@ -6,7 +6,7 @@
             <field name="name">User Submitted Assessment</field>
             <field name="model_id" ref="website_ora_elearning.model_open_response_rubric_staff"/>
             <field name="subject">User submitted assessment for Peer Review - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">{{ object.company_id.email_formatted }}</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="use_default_to" eval="True"/>
             <field name="body_html" type="html">
                 <table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">
@@ -181,7 +181,7 @@
             <field name="name">Assessment Completed</field>
             <field name="model_id" ref="website_ora_elearning.model_ora_response"/>
             <field name="subject">Your Assessment is Completed - {{ ctx.get('slide_name') }}</field>
-            <field name="email_from">{{ object.company_id.email_formatted }}</field>
+            <field name="email_from">{{ ctx.get('company_email') }}</field>
             <field name="use_default_to" eval="True"/>
             <field name="body_html" type ="html">
                 <table border="0" cellpadding="0" style="padding-top: 16px; background-color: #F1F1F1; color: #454748; width: 100%; border-collapse:separate;"><tr><td align="center">

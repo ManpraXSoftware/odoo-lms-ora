@@ -97,7 +97,7 @@ class WebsiteSlidesORA(WebsiteSlides):
                 'email_to': peer.partner_id.email_formatted,
             }
             email_template = request.env.ref('website_ora_elearning.email_template_peer_review_submitted', raise_if_not_found=False).sudo()
-            email_template.with_context(slide_name=slide.name,peer_user_name=peer.partner_id.name,user_name=request.env.user.name,slide_url=slide.website_url + '?fullscreen=1#',).send_mail(res_id=peer.id,force_send=True, email_values=email_values)
+            email_template.with_context(slide_name=slide.name,peer_user_name=peer.partner_id.name,user_name=request.env.user.name,company_email=request.env.company.email_formatted,slide_url=slide.website_url + '?fullscreen=1#',).send_mail(res_id=peer.id,force_send=True, email_values=email_values)
 
         return {'success': True, 'message': 'All peers are notified!'}
             

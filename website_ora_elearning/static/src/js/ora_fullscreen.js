@@ -206,9 +206,12 @@
                     }
                     $content.empty().append(renderToFragment('slide.ora.assessment', {widget: data}));
                     $content.find("textarea.o_wysiwyg_loader").toArray().forEach((textarea) => {
+                        
+                        const value = textarea.innerHTML.trim();
+                        textarea.value = value;
                         const props = {
-                            // textareaEl: textarea,
                             fullEdit: true,
+                            value: value,
                             getRecordInfo: () => ({
                                 context: this.services.website_page.context,
                                 resModel: "open.response.user.line",
@@ -220,12 +223,6 @@
                             resizable: !isMobileOS(),
                             height: "100px",
                         };
-                        // var $textarea = $(textarea);
-                        // var options = {
-                        //     resizable: true,
-                        //     userGeneratedContent: true,
-                        //     height: 200,
-                        // };
                         loadWysiwygFromTextarea(this, textarea, props)
                     });
                     $('.custom_response').click(function () {

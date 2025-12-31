@@ -36,8 +36,14 @@ export async function loadWysiwygFromTextarea(parent, textarea, options) {
     $wysiwygWrapper.html('');
     const wysiwygWrapper = $wysiwygWrapper[0];
     await attachComponent(parent, wysiwygWrapper, LegacyWysiwyg, {
-        options: currentOptions,
-        editingValue: currentOptions.value,
+        // options: currentOptions,
+        // readonly: false,
+        // editingValue: currentOptions.value,
+        value: currentOptions.value,
+        readonly: false,
+        config: {
+            ...currentOptions,
+        },
     });
     $wysiwygWrapper.find('.odoo-editor-editable').addClass('note-editable')
     $form.find('.note-editable').data('wysiwyg', wysiwyg);
@@ -45,7 +51,14 @@ export async function loadWysiwygFromTextarea(parent, textarea, options) {
     // o_we_selected_image has not always been removed when
     // saving a post so we need the line below to remove it if it is present.
     $form.find('.note-editable').find('img.o_we_selected_image').removeClass('o_we_selected_image');
-
+    const html = currentOptions.value;
+    if (html && wysiwyg.editor?.isReady) {
+        const editor = wysiwyg.editor;
+        // wait one tick so html_editor finishes post-init normalization
+        requestAnimationFrame(() => {
+            editor.editable.innerHTML = html;
+        });
+    }
     let b64imagesPending = true;
     $form.on('click', 'button[type=submit]', (ev) => {
         if (b64imagesPending) {
