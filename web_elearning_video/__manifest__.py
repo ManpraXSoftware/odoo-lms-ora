@@ -5,19 +5,16 @@
     'category': 'Extra Tools',
     'summary': 'Create and play videos/audios on Odoo platform',
     'sequence': 10,
-    'version': '1.3',
+    'version': '19.0.1.0',
     'website': 'https://www.manprax.com',
     'author': 'ManpraX Software LLP',
-    'depends': ['web', 'website', 'website_slides', 'web_editor'],
+    'depends': ['web', 'website', 'website_slides', 'html_editor'],
     'assets': {
-        'web_editor.assets_wysiwyg': [
-            'web_elearning_video/static/src/js/wysiwyg.js',
-        ],
-        'web.assets_backend': [
+        'html_editor.assets_editor': [
             'web_elearning_video/static/src/js/video_plugin.js',
             'web_elearning_video/static/src/js/audio_plugin.js',
         ],
-        'web_editor.assets_media_dialog': [
+        'html_editor.assets_media_dialog': [
             'web_elearning_video/static/src/js/video_dialog.js',
             'web_elearning_video/static/src/xml/video_dialog_template.xml',
             'web_elearning_video/static/src/js/audio_dialog.js',
